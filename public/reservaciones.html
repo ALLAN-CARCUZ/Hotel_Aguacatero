@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservaciones</title>
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/reservaciones.css">
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <header>
+    </header>
+    
+    
+
+    <!-- Título de la página -->
+    <h1>Listado de Reservaciones</h1>
+
+    <!-- Tabla de reservaciones -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID Reservación</th>
+                <th>ID Usuario</th>
+                <th>ID Habitación</th>
+                <th>ID Paquete</th>
+                <th>Costo Total</th>
+                <th>Método de Pago</th>
+                <th>Fecha Ingreso</th>
+                <th>Fecha Salida</th>
+            </tr>
+        </thead>
+        <tbody id="reservaciones-list">
+            <!-- Aquí se insertarán las reservaciones -->
+        </tbody>
+    </table>
+
+    <script>
+        async function cargarReservaciones() {
+            try {
+                const response = await fetch('/api/reservaciones');
+                const reservaciones = await response.json();
+
+                const reservacionesList = document.getElementById('reservaciones-list');
+                reservacionesList.innerHTML = ''; // Limpiar lista
+
+                reservaciones.forEach(reservacion => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${reservacion.id_reservacion}</td>
+                        <td>${reservacion.id_usuario}</td>
+                        <td>${reservacion.id_habitacion}</td>
+                        <td>${reservacion.id_paquete ? reservacion.id_paquete : 'N/A'}</td>
+                        <td>Q${reservacion.costo_total.toFixed(2)}</td>
+                        <td>${reservacion.metodo_pago}</td>
+                        <td>${new Date(reservacion.fecha_ingreso).toLocaleDateString()}</td>
+                        <td>${new Date(reservacion.fecha_salida).toLocaleDateString()}</td>
+                    `;
+                    reservacionesList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al cargar las reservaciones:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarReservaciones);
+    
+    // Función para obtener los parámetros de la URL
+function getQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        paquete_id: params.get('paquete_id')
+    };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const { paquete_id } = getQueryParams();
+
+    if (paquete_id) {
+        console.log(`Reservación para el paquete con ID: ${paquete_id}`);
+        // Aquí puedes manejar la lógica para crear la reservación usando el paquete seleccionado
+        // Por ejemplo, mostrar la fecha de ingreso, salida, y método de pago
+    } else {
+        cargarReservaciones();  // Si no hay paquete, mostrar todas las reservaciones como antes
+    }
+});
+
+    
+    </script>
+
+    
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 Hotel El Dodo. Todos los derechos reservados.</p>
+    </footer>
+
+    
+    <script src="scripts/header.js"></script>
+    <script src="scripts/scriptreservaciones.js"></script>
+    <script src="scripts/scriptreservacionesauth.js"></script>
+    <script src="scripts/auth.js"></script>
+    
+</body>
+</html>

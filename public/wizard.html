@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservación Wizard</title>
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/wizard.css"> <!-- Estilos específicos para el wizard -->
+    <link rel="stylesheet" href="css/header.css">
+</head>
+<body>
+
+    <!-- Barra de navegación superior -->
+    <header>
+    </header>
+    
+
+    <!-- Wizard de Reservación -->
+    <div class="wizard-container">
+        <h2>Reserva tu habitación</h2>
+
+        <!-- Steps Indicator -->
+        <div class="steps-indicator">
+            <span class="step active">1</span>
+            <span class="step">2</span>
+            <span class="step">3</span>
+            <span class="step">4</span>
+            <span class="step">5</span> <!-- Nuevo paso añadido -->
+        </div>
+
+        <!-- Step 1: Elegir Habitación -->
+        <div class="step-content" id="step-1">
+            <h3>Elige tu Habitación</h3>
+            
+            <div id="habitaciones-container">
+                <!-- Las habitaciones se cargarán dinámicamente desde el script -->
+            </div>
+
+            <!-- Campos de fecha de entrada y salida -->
+            <div class="date-selection">
+                <label for="fecha-entrada">Fecha de Entrada:</label>
+                <input type="date" id="fecha-entrada" required>
+
+                <label for="fecha-salida">Fecha de Salida:</label>
+                <input type="date" id="fecha-salida" required>
+
+                <!-- Campo oculto para ID_PAQUETE -->
+                <input type="hidden" id="ID_PAQUETE" value="">
+            </div>
+
+            <button type="button" class="next-btn" onclick="nextStep()">Siguiente</button>
+        </div>
+
+        <!-- Step 2: Elegir Servicios -->
+        <div class="step-content" id="step-2" style="display:none;">
+            <h3>Elige Servicios Adicionales</h3>
+
+            <!-- Mostrar habitación seleccionada -->
+            <div id="selected-habitacion-container"></div> <!-- Este es el contenedor donde aparecerá la habitación seleccionada -->
+
+            <!-- Contenedor para mostrar el precio total actualizado -->
+           <!-- Contenedor para mostrar el desglose del precio total actualizado -->
+<div id="desglose-precio">
+    <h4>Detalles de la Reserva:</h4>
+    <p><strong>Costo base por habitación:</strong> <span id="costo-base-habitacion">0.00</span></p>
+    <p><strong>Número de noches a reservar:</strong> <span id="cantidad-noches">0</span></p>
+    <p><strong>Total de la habitación:</strong> <span id="total-habitacion">0.00</span></p>
+    <p><strong>Precio base de servicios:</strong> <span id="costo-servicios-base">0.00</span></p>
+    <p><strong>Total de servicios por reserva (con extra):</strong> <span id="total-servicios">0.00</span></p>
+    <h4>Total general: <span id="total-price">0.00</span></h4>
+</div>
+
+
+            <div id="servicios-container">
+                <!-- Los servicios se cargarán dinámicamente desde el script -->
+            </div>
+
+            <button type="button" class="prev-btn" onclick="prevStep()">Anterior</button>
+            <button type="button" class="next-btn" onclick="nextStep()">Siguiente</button>
+        </div>
+
+        <!-- Step 3: Método de Pago -->
+        <div class="step-content" id="step-3" style="display:none;">
+            <h3>Método de Pago</h3>
+            <select id="metodo-pago">
+                <option value="">Selecciona un método de pago</option>
+                <option value="tarjeta">Pago con tarjeta</option>
+                <option value="recepcion">Pago en recepción</option>
+            </select>
+
+            <button type="button" class="prev-btn" onclick="prevStep()">Anterior</button>
+            <button type="button" class="next-btn" onclick="nextStep()">Siguiente</button>
+        </div>
+
+<!-- Paso 4: Formulario de Stripe Elements -->
+<div class="step-content" id="step-4" style="display:none;">
+    <h3>Detalles de Pago con Tarjeta</h3>
+
+    <!-- Campo de Nombre en la Tarjeta -->
+    <label for="cardholder-name">Nombre en la tarjeta</label>
+    <input type="text" id="cardholder-name" placeholder="Nombre completo" required>
+
+    <!-- Contenedor de Número de Tarjeta -->
+    <label for="card-number">Número de tarjeta</label>
+    <div id="card-number" class="input-field"></div>
+
+    <!-- Contenedor de Fecha de Expiración -->
+    <div class="form-row">
+        <div class="half-width">
+            <label for="card-expiry">Fecha de Expiración</label>
+            <div id="card-expiry" class="input-field"></div>
+        </div>
+
+        <!-- Contenedor de CVC -->
+        <div class="half-width">
+            <label for="card-cvc">CVC</label>
+            <div id="card-cvc" class="input-field"></div>
+        </div>
+    </div>
+
+    <!-- Contenedor de Código Postal -->
+    <label for="card-zip">Código Postal</label>
+    <div id="card-zip" class="input-field"></div>
+
+    <!-- Mensaje de Error -->
+    <div id="card-errors" role="alert"></div>
+
+    <!-- Botón de Pago -->
+    <button type="button" class="next-btn" onclick="procesarPagoStripe()">Pagar</button>
+</div>
+
+
+        <!-- Step 5: Confirmación -->
+        <div class="step-content" id="step-5" style="display:none;">
+            <h3>Confirmación de la Reserva</h3>
+            <p id="confirmacion-texto">¡Gracias por tu reserva! Nos pondremos en contacto contigo para más detalles.</p>
+            <button type="button" onclick="location.href='inicio.html'">Volver al Inicio</button>
+        </div>
+    </div>
+
+    <!-- Pie de página -->
+    <footer>
+        <p>© 2024 Hotel El Dodo. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="scripts/scriptwizard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script src="scripts/header.js"></script>
+    <!-- Incluye Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+
+</body>
+</html>

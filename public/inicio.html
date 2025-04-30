@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel El Dodo</title>
+    <link rel="stylesheet" href="css/inicio.css">
+    <link rel="stylesheet" href="css/header.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <header>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Disfruta de tus Vacaciones de Ensueño</h1>
+            <p>Reserva habitaciones y paquetes a precios inmejorables</p>
+        </div>
+    </section>
+
+
+<!-- Conoce nuestras habitaciones -->
+<section class="section-title section-habitaciones">
+    <h2>Conoce nuestras habitaciones</h2>
+    <p>Explora nuestras opciones de habitaciones que se adaptan a todas tus necesidades.</p>
+
+    <!-- Botón para ir a la página de habitaciones -->
+    <button onclick="location.href='habitacion.html'" class="btn btn-primary mt-3 mb-4">Ver todas las habitaciones</button>
+    <!-- Carrusel de Habitaciones Populares con imágenes estáticas -->
+    <div id="habitacionCarousel" class="carousel slide" data-ride="carousel" data-interval="2000">
+        <!-- Indicadores -->
+        <ol class="carousel-indicators">
+            <li data-target="#habitacionCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#habitacionCarousel" data-slide-to="1"></li>
+            <li data-target="#habitacionCarousel" data-slide-to="2"></li>
+        </ol>
+
+        <!-- Imágenes del carrusel -->
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="imagenes/habitacion1.jpg" class="d-block w-100" alt="Habitación 1">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Habitación Estándar</h5>
+                    <p>Una opción cómoda y accesible para tu estancia.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="imagenes/habitacion2.jpg" class="d-block w-100" alt="Habitación 2">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Suite Junior</h5>
+                    <p>Disfruta de más espacio y lujo en esta suite.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="imagenes/habitacion3.jpg" class="d-block w-100" alt="Habitación 3">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Suite Premium</h5>
+                    <p>El máximo lujo y confort con vista al mar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles de navegación -->
+        <a class="carousel-control-prev" href="#habitacionCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Anterior</span>
+        </a>
+        <a class="carousel-control-next" href="#habitacionCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </a>
+    </div>
+
+</section>
+
+
+
+
+    <!-- Nuestros servicios con carrusel de Bootstrap -->
+<section class="section-title section-servicios">
+    <h2>Nuestros servicios</h2>
+    <p>Descubre todos los servicios que ofrecemos para una estancia memorable.</p>
+
+    <!-- Botón para ir a la página de servicios -->
+    <button onclick="location.href='servicio.html'" class="btn btn-primary mt-3 mb-4">Ver todos los servicios</button>
+
+    <!-- Carrusel de Bootstrap con intervalo ajustado -->
+    <div id="serviceCarousel" class="carousel slide" data-ride="carousel" data-interval="2000">
+        <!-- Indicadores -->
+        <ol class="carousel-indicators">
+            <li data-target="#serviceCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#serviceCarousel" data-slide-to="1"></li>
+            <li data-target="#serviceCarousel" data-slide-to="2"></li>
+        </ol>
+
+        <!-- Imágenes del carrusel -->
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="imagenes/servicio1.jpg" class="d-block w-100" alt="Servicio 1">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>SERVICIOS HOTEL EL DODO</h5>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="imagenes/servicio2.jpg" class="d-block w-100" alt="Servicio 2">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>SERVICIOS HOTEL EL DODO</h5>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="imagenes/servicio3.jpg" class="d-block w-100" alt="Servicio 3">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>SERVICIOS HOTEL EL DODO</h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles de navegación -->
+        <a class="carousel-control-prev" href="#serviceCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Anterior</span>
+        </a>
+        <a class="carousel-control-next" href="#serviceCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Siguiente</span>
+        </a>
+    </div>
+</section>
+
+
+<section class="section-title section-paquetes">
+    <h2>Paquetes y ofertas disponibles</h2>
+    <p>Aprovecha nuestras ofertas especiales y paquetes diseñados para ti.</p>
+
+    <!-- Botón para ir a la página de paquetes -->
+    <button onclick="location.href='paquete.html'" class="btn btn-primary mt-3 mb-4">Ver todos los paquetes</button>
+
+    <!-- Carrusel de Paquetes -->
+    <div id="paqueteCarousel" class="carousel slide" data-ride="carousel" data-interval="2000">
+        <!-- Indicadores -->
+        <ol class="carousel-indicators">
+            <li data-target="#paqueteCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#paqueteCarousel" data-slide-to="1"></li>
+            <li data-target="#paqueteCarousel" data-slide-to="2"></li>
+        </ol>
+
+        <!-- Imágenes del carrusel -->
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="imagenes/paquete1.jpg" class="d-block w-100" alt="Paquete 1">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Paquete Familiar</h5>
+                    <p>Disfruta de un descuento especial en habitaciones familiares.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="imagenes/paquete2.jpg" class="d-block w-100" alt="Paquete 2">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Escapada Romántica</h5>
+                    <p>Incluye cena y spa para parejas.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="imagenes/paquete3.jpg" class="d-block w-100" alt="Paquete 3">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Paquete Aventura</h5>
+                    <p>Explora actividades al aire libre con un 15% de descuento.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles de navegación -->
+        <a class="carousel-control-prev" href="#paqueteCarousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Anterior</span>
+        </a>            
+        <a class="carousel-control-next" href="#paqueteCarousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Siguiente</span>
+        </a>
+    </div>
+</section>
+
+
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 Hotel El Dodo. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Incluir el script aquí -->
+    <script src="scripts/inicioscript.js"></script>
+    <script src="scripts/header.js"></script>
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

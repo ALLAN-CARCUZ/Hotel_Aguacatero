@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/headerlogin.css">
+</head>
+<body>
+    <header>
+    </header>
+
+    <div class="login-container">
+        <!-- Columna del Logo -->
+        <div class="logo-container">
+            <img src="imagenes/logo.jpg" alt="Hotel El Dodo Logo">
+            <p class="account-prompt">¿No tienes cuenta? <a href="register.html">Regístrate aquí</a></p>
+        </div>
+    
+        <!-- Columna del Formulario de Inicio de Sesión -->
+        <div class="form-container">
+            <h1>Inicio de Sesión</h1>
+            <form id="loginForm">
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" required>
+    
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+    
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+        </div>
+    </div>
+    
+
+    <div class="message-box" id="messageBox"></div>
+
+    <script src="scripts/login.js"></script>
+    <script src="scripts/headerlogin.js"></script>
+</body>
+</html>

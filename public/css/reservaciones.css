@@ -1,0 +1,242 @@
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Título de la página */
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* Tabla de reservaciones */
+table {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    font-size: 1.1rem;
+}
+
+th {
+    background: linear-gradient(to right, #667eea, #764ba2);
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+td {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:nth-child(even) td {
+    background-color: #f9f9f9;
+}
+
+tr:hover td {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+/* Estilo de precios */
+td:nth-child(5) {
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+/* Estilos del modal */
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e74c3c;
+    cursor: pointer;
+}
+
+.modal h2 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.modal p {
+    font-size: 1.1rem;
+    margin: 10px 0;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+    table {
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .modal-content {
+        width: 90%;
+        max-width: 500px;
+    }
+}
+
+/* Footer */
+footer {
+    background: linear-gradient(to right, #667eea, #764ba2);
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: auto;
+    width: 100%;
+}
+
+/* Estilos de las tarjetas de reservaciones */
+#reservacionesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.reservacion-card {
+    width: 300px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-align: left;
+    transition: transform 0.3s ease;
+    padding: 15px;
+}
+
+.reservacion-card:hover {
+    transform: translateY(-5px);
+}
+
+.reservacion-header {
+    background: #f5f5f5;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.reservacion-body {
+    padding: 15px;
+}
+
+.reservacion-body p {
+    margin: 10px 0;
+    color: #555;
+}
+
+.reservacion-body ul {
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+.reservacion-footer {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background: #f5f5f5;
+}
+
+/* Botones */
+.btn {
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+.btn-modificar {
+    background-color: #28a745; /* Verde para modificar */
+}
+
+.btn-modificar:hover {
+    background-color: #218838;
+}
+
+.btn-cancelar {
+    background-color: #dc3545; /* Rojo para cancelar */
+}
+
+.btn-cancelar:hover {
+    background-color: #c82333;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.reservacion-imagen {
+    width: 100%;
+    max-width: 200px; /* Ajusta el tamaño máximo según sea necesario */
+    height: auto;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}

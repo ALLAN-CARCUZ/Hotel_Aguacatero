@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficas de Servicios</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/grafica.css">
+    <link rel="stylesheet" href="css/header.css">
+</head>
+<body>
+
+
+    <!-- Barra de navegación superior -->
+    <header>
+    </header>
+
+
+
+    
+    <div class="charts-container">
+        <div class="chart-box">
+            <h1>Servicios Más Utilizados</h1>
+            <div class="chart-container">
+                <canvas id="serviciosChart"></canvas>
+            </div>
+        </div>
+    
+        <div class="chart-box">
+            <h1>Habitaciones Más Reservadas</h1>
+            <div class="chart-container">
+                <canvas id="habitacionesChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="charts-row">
+        <div class="chart-box">
+            <h1>Total de Reservaciones por Mes en 2024</h1>
+            <div class="chart-container">
+                <canvas id="reservacionesMesChart"></canvas>
+            </div>
+        </div>
+    
+        <div class="chart-box">
+            <h1>Usuarios Registrados por País</h1>
+            <div class="chart-container">
+                <canvas id="usuariosPaisChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+
+
+
+    <div class="info-box">
+        <h3>Cantidad de usuarios</h3>
+        <p id="cantidad-usuarios">Cargando...</p>
+    </div>
+
+
+    <div class="info-bo">
+        <h3>Ingresos Totales</h3>
+        <p id="total-ingresos">Cargando...</p>
+    </div>
+
+
+    <div class="info-b">
+        <h3>Hospedaje promedio</h3>
+        <p id="promedio-dias">Cargando...</p>
+    </div>
+
+
+
+    <div class="download-container">
+        <button id="download-pdf">Descargar en PDF</button>
+    </div>
+
+
+
+    <script>
+document.getElementById('download-pdf').addEventListener('click', async () => {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'pt', 'letter'); // Tamaño de página en carta (letter)
+
+    const elementsToCapture = [
+        document.querySelector('.charts-container'),       // Gráfica de reservaciones
+        document.querySelector('.charts-row'),             // Gráfica de usuarios por país
+        document.querySelectorAll('.info-box'),            // Cuadro informativo
+        document.querySelectorAll('.info-bo'), 
+        document.querySelectorAll('.info-b')
+    ];
+
+    let positionY = 40;  // Posición inicial en el PDF
+
+    for (let element of elementsToCapture) {
+        if (element instanceof NodeList) {
+            for (let subElement of element) {
+                // Para los cuadros informativos, aplica un escalado mayor y ajusta la altura
+                const isInfoBox = subElement.classList.contains('info-box') || 
+                                  subElement.classList.contains('info-bo') || 
+                                  subElement.classList.contains('info-b');
+                const scale = isInfoBox ? 3 : 1.5; // Usa un escalado mayor para mejorar la claridad
+
+                const canvas = await html2canvas(subElement, { scale });
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Mantén la altura fija en 2 cm y ajusta el ancho según la relación de aspecto
+                const fixedHeight = 56.7; // 2 cm en puntos
+                const imgWidth = (canvas.width * fixedHeight) / canvas.height;
+
+                if (positionY + fixedHeight > pdf.internal.pageSize.getHeight() - 40) {
+                    pdf.addPage();
+                    positionY = 40;
+                }
+
+                pdf.addImage(imgData, 'PNG', 30, positionY, imgWidth, fixedHeight);
+                positionY += fixedHeight + 20;
+            }
+        } else {
+            const canvas = await html2canvas(element, { scale: 1.5 });
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = pdf.internal.pageSize.getWidth() - 60;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            if (positionY + imgHeight > pdf.internal.pageSize.getHeight() - 40) {
+                pdf.addPage();
+                positionY = 40;
+            }
+
+            pdf.addImage(imgData, 'PNG', 30, positionY, imgWidth, imgHeight);
+            positionY += imgHeight + 20;
+        }
+    }
+
+    pdf.save('Reporte_Hotel_Carta.pdf');
+});
+
+    </script>
+    
+
+
+
+    <script>
+        fetch('/api/reservaciones/promedio/promedio-dias')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('promedio-dias').innerText = `${data.promedio.toFixed(1)} días`; // Muestra el promedio con un decimal
+            })
+            .catch(error => console.error('Error al obtener el promedio de días:', error));
+    </script>
+    
+    
+
+
+    <script>
+        // Hacer la solicitud a la API para obtener los datos de reservaciones por mes
+        fetch('/api/reservaciones/mensuales/reservaciones-por-mes')
+        .then(response => response.json())
+    .then(data => {
+        // Mapear los números de meses a nombres
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", 
+                       "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const labels = data.labels.map(mes => meses[parseInt(mes) - 1]); // Convertir número a nombre de mes
+
+        var ctx = document.getElementById('reservacionesMesChart').getContext('2d');
+        var reservacionesMesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,  // Usar nombres de meses
+                datasets: [{
+                    label: 'Cantidad de Reservaciones',
+                    data: data.values,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Meses'
+                        }
+                    }
+                }
+            }
+        });
+    })
+    .catch(error => console.error('Error al obtener los datos:', error));
+    </script>
+
+
+    <script>
+        // Hacer la solicitud a la API para obtener los datos de usuarios por país
+        fetch('/api/usuarios/usuarios-por-pais')
+            .then(response => response.json())
+            .then(data => {
+                var ctx = document.getElementById('usuariosPaisChart').getContext('2d');
+                var usuariosPaisChart = new Chart(ctx, {
+                    type: 'bar',  // Configura como gráfica de barras
+                    data: {
+                        labels: data.labels,  // Nombres de los países
+                        datasets: [{
+                            label: 'Cantidad de Usuarios',
+                            data: data.values,  // Número de usuarios por país
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',  // Configura el eje de las barras en horizontal
+                        scales: {
+                            x: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al obtener los datos:', error));
+    </script>
+
+
+
+    <script>
+        // Hacer la solicitud a la API para obtener los datos de habitaciones más reservadas
+        fetch('/api/habitaciones/reservadas/habitaciones-mas-reservadas')
+            .then(response => response.json())
+            .then(data => {
+                var ctx = document.getElementById('habitacionesChart').getContext('2d');
+                var habitacionesChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,  // Nombres de las habitaciones
+                        datasets: [{
+                            label: 'Número de reservaciones',
+                            data: data.values,  // Número de veces que fue reservada
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al obtener los datos:', error));
+    </script>
+
+
+    <script>
+        // Cargar la cantidad total de ingresos
+        fetch('/api/reservaciones/ingreso/ingresos-total')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('total-ingresos').textContent = `$${data.totalIngresos}`;
+            })
+            .catch(error => console.error('Error al obtener los ingresos totales:', error));
+    </script>
+
+
+    <script>
+        // Cargar la gráfica de servicios más utilizados
+        fetch('/api/servicios/servicios-mas-utilizados')
+            .then(response => response.json())
+            .then(data => {
+                var ctx = document.getElementById('serviciosChart').getContext('2d');
+                var serviciosChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Número de veces utilizado',
+                            data: data.values,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error al obtener los datos:', error));
+
+        // Cargar la cantidad de usuarios
+        fetch('/api/usuarios/cantidad')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('cantidad-usuarios').textContent = data.cantidad;
+            })
+            .catch(error => console.error('Error al obtener la cantidad de usuarios:', error));
+    </script>
+
+
+
+
+    <script>
+        // Hacer la solicitud a la API para obtener los datos
+        fetch('/api/servicios/servicios-mas-utilizados')
+          .then(response => response.json())
+          .then(data => {
+              var ctx = document.getElementById('serviciosChart').getContext('2d');
+              var serviciosChart = new Chart(ctx, {
+                  type: 'bar',
+                  data: {
+                      labels: data.labels,  // Nombres de los servicios
+                      datasets: [{
+                          label: 'Número de veces utilizado',
+                          data: data.values,  // Número de usos de cada servicio
+                          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                          borderColor: 'rgba(75, 192, 192, 1)',
+                          borderWidth: 1
+                      }]
+                  },
+                  options: {
+                      scales: {
+                          y: {
+                              beginAtZero: true
+                          }
+                      }
+                  }
+              });
+          })
+          .catch(error => console.error('Error al obtener los datos:', error));
+    </script>
+
+
+    <!-- Pie de página -->
+    <footer>
+        <p>© 2024 Hotel El Dodo. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/header.js"></script>
+
+</body>
+</html>

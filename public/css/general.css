@@ -1,0 +1,149 @@
+/* general.css */
+
+/* Reset y estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+
+/* Botón para abrir el modal */
+.open-modal-btn {
+    display: block;
+    margin: 35px auto 20px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.open-modal-btn:hover {
+    background-color: #218838;
+}
+
+/* Estilos de los botones */
+button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-right: 10px;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+button.delete {
+    background-color: #dc3545;
+}
+
+button.delete:hover {
+    background-color: #c82333;
+}
+
+/* Estilos del footer */
+footer {
+    background: linear-gradient(to right, #667eea, #764ba2);
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    width: 100%;
+}
+
+/* Ajustes para evitar desplazamiento horizontal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 10px;
+    overflow-x: hidden;
+}
+
+/* Ajuste general de la página */
+main {
+    flex: 1;
+    padding: 100px 20px 20px;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    ul#habitacionList li,
+    ul#servicioList li,
+    ul#paqueteList li {
+        width: 100%;
+    }
+}
+
+/* Estilos para el menú desplegable */
+.auth-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle {
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+}
+
+.dropdown-menu {
+    display: none; /* El menú estará oculto inicialmente */
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.dropdown-menu a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 1rem;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f1f1f1;
+}
+
+.auth-menu:hover .dropdown-menu {
+    display: block; /* Mostrar el menú cuando se hace hover sobre el contenedor */
+}
+
+/* Aseguramos que el menú aparezca por encima de otros elementos */
+.auth-menu .dropdown-menu {
+    z-index: 10;
+}
+
+/* Ocultar el menú cuando se cierra */
+.dropdown-menu.hidden {
+    display: none;
+}

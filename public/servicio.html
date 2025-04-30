@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Servicios</title>
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/servicio.css">
+    <link rel="stylesheet" href="css/header.css">
+</head>
+<body>
+
+    <!-- Barra de navegación superior -->
+    <header>
+    </header>
+    
+
+<!-- Botón para abrir el formulario de registro de servicio en el modal -->
+<button class="open-modal-btn admin-only" id="openRegisterModal" style="display: none;">Agregar Servicio</button>
+
+
+    <!-- Modal para registrar nuevo servicio -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeRegisterModal">&times;</button>
+            <h1>Formulario de Registro</h1>
+            <form id="servicioForm" enctype="multipart/form-data">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" required>
+            
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" required></textarea>
+            
+                <label for="costo">Costo</label>
+                <input type="number" step="0.01" id="costo" name="costo" required>
+            
+                <label for="imagen">Imagen (opcional)</label>
+                <input type="file" id="imagen" name="imagen" accept="image/*">
+            
+                <button type="submit">Registrar Servicio</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para actualizar servicio -->
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeUpdateModal">&times;</button>
+            <div id="updateFormContainer">
+                <!-- Aquí se cargará dinámicamente el formulario de actualización -->
+            </div>
+        </div>
+    </div>
+
+    <h2 style="margin-top: 30px; text-align: center; font-size: 2em;">Lista de Servicios</h2>
+    <ul id="servicioList">
+        <!-- Los servicios ingresados aparecerán aquí -->
+    </ul>
+
+    <!-- Pie de página -->
+    <footer>
+        <p>© 2024 Hotel El Dodo. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Mover los scripts justo antes del cierre de body para asegurar que el DOM esté cargado -->
+    <script src="scripts/scriptservicio.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/header.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Paquetes</title>
+    <link rel="stylesheet" href="css/general.css">
+    <link rel="stylesheet" href="css/paquete.css">
+    <link rel="stylesheet" href="css/header.css">
+</head>
+<body>
+
+    <!-- Barra de navegación superior -->
+    <header>
+        <!-- Aquí puedes incluir el contenido del header si es necesario -->
+    </header>
+
+    <!-- Botón para abrir el formulario de registro de paquete en el modal -->
+    <button class="open-modal-btn admin-only" id="openRegisterModal" style="display: none;">Agregar Paquete</button>
+
+    <!-- Modal para registrar nuevo paquete -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeRegisterModal">&times;</button>
+            <h1>Formulario de Registro de Paquete</h1>
+            <form id="paqueteForm" enctype="multipart/form-data">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" required>
+            
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" required></textarea>
+            
+                <label for="precioTotal">Precio Total</label>
+                <input type="text" id="precioTotal" name="precioTotal" readonly>                
+                
+                <label for="habitacion_id">Habitación</label>
+                <select id="habitacion_id" name="habitacion_id" required>
+                    <option value="">Selecciona una habitación</option>
+                    <!-- Las opciones se cargarán dinámicamente -->
+                </select>
+
+                <label>Servicios</label>
+                <div id="serviciosContainer">
+                    <!-- Los checkboxes de servicios se cargarán dinámicamente -->
+                </div>
+
+                <label for="imagen">Imagen (opcional)</label>
+                <input type="file" id="imagen" name="imagen" accept="image/*">
+
+                <label for="descuento">Descuento (%):</label>
+                <input type="number" id="descuento" name="descuento" min="0" max="100" value="0"><br>
+            
+                <button type="submit">Registrar Paquete</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para actualizar paquete -->
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeUpdateModal">&times;</button>
+            <div id="updateFormContainer">
+                <!-- Aquí se cargará dinámicamente el formulario de actualización -->
+            </div>
+        </div>
+    </div>
+
+    <h2 style="margin-top: 30px; text-align: center; font-size: 2em;">Lista de Paquetes</h2>
+    <ul id="paqueteList">
+        <!-- Los paquetes ingresados aparecerán aquí -->
+    </ul>
+
+    <!-- Pie de página -->
+    <footer>
+        <p>© 2024 Hotel El Dodo. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Mover los scripts justo antes del cierre de body para asegurar que el DOM esté cargado -->
+    <script src="scripts/scriptpaquete.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/header.js"></script>
+</body>
+</html>
