@@ -52,7 +52,7 @@ async function createReservacion(req, res) {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: correoCliente,
-            subject: 'Confirmación de reservación - Hotel El Dodo',
+            subject: 'Confirmación de reservación - Hotel El Aguacatero',
             text: `Estimado/a ${usuario.nombre},\n\nSu reservación ha sido creada exitosamente. Aquí están los detalles:\n\n
             ${id_paquete ? `Paquete ID: ${id_paquete}` : `Habitación: ${id_habitacion}`}\n
             Fecha de entrada: ${fecha_ingreso}\n

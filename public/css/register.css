@@ -94,7 +94,7 @@ form#usuarioForm select:focus {
 /* Botón de registrar */
 form#usuarioForm button[type="submit"] {
     width: 100%;
-    background: linear-gradient(to right, #667eea, #764ba2);
+    background: linear-gradient(to right, rgb(40, 143, 35), rgb(15, 54, 13));
     color: white;
     border: none;
     padding: 14px;
@@ -105,7 +105,7 @@ form#usuarioForm button[type="submit"] {
 }
 
 form#usuarioForm button[type="submit"]:hover {
-    background: linear-gradient(to right, #764ba2, #667eea);
+    background: linear-gradient(to right, rgb(15, 54, 13), rgb(40, 143, 35));
     box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
 }
 
@@ -119,12 +119,12 @@ form#usuarioForm button[type="submit"]:hover {
 }
 
 .login-link a {
-    color: #667eea;
+    color: rgb(40, 143, 35);
     text-decoration: none;
     font-weight: bold;
 }
 
 .login-link a:hover {
-    color: #764ba2;
+    color: rgb(15, 54, 13);
     text-decoration: underline;
 }

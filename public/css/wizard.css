@@ -39,7 +39,7 @@ body {
 }
 
 .steps-indicator .step.active {
-    background-color: #667eea;
+    background-color: rgb(40, 143, 35);
     color: white;
 }
 
@@ -76,13 +76,13 @@ body {
 
 .habitacion-card p, .servicio-card p {
     font-size: 1rem;
-    color: #666;
+    color: #333;
     margin: 5px 0;
 }
 
 .habitacion-card .price, .servicio-card .price {
     font-size: 1.2rem;
-    color: #e74c3c;
+    color: rgb(40, 143, 35);
     font-weight: bold;
 }
 
@@ -126,7 +126,7 @@ body {
 /* Botones para los pasos del wizard */
 button {
     padding: 12px 20px;
-    background-color: #667eea;
+    background-color: rgb(40, 143, 35);
     color: white;
     border: none;
     border-radius: 5px;
@@ -137,7 +137,7 @@ button {
 }
 
 button:hover {
-    background-color: #764ba2;
+    background-color: rgb(15, 54, 13);
 }
 
 /* Botones de navegación entre pasos */
@@ -149,7 +149,7 @@ button:hover {
 #metodo-pago {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid rgb(40, 143, 35);
     border-radius: 5px;
     margin-top: 15px;
     font-size: 1rem;
@@ -158,8 +158,8 @@ button:hover {
 /* Pie de página */
 footer {
     margin-top: auto;
-    background: linear-gradient(to right, #667eea, #764ba2);
-    color: white;
+    background: linear-gradient(to right, #feffd4d4, #feffd4d4);
+    color: rgb(15, 54, 13);
     text-align: center;
     padding: 20px 0;
     width: 100%;
@@ -203,9 +203,9 @@ footer {
 
 /* Estilo para los botones seleccionados */
 button.selected {
-    background-color: #4CAF50; /* Color verde para indicar selección */
+    background-color: rgb(15, 54, 13); /* Color verde para indicar selección */
     color: white;  /* Color del texto */
-    border: 2px solid #4CAF50;  /* Un borde del mismo color */
+    border: 2px solid rgb(15, 54, 13);  /* Un borde del mismo color */
     cursor: default;  /* Cambiar el cursor para deshabilitar */
 }
 
@@ -258,8 +258,8 @@ button.selected:hover {
 
 #cardholder-name:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+    border-color: rgb(40, 143, 35);
+    box-shadow: 0 0 5px rgb(15, 54, 13);
 }
 
 /* Contenedor de Stripe Elements */
@@ -297,7 +297,7 @@ button.selected:hover {
     width: 100%;
     padding: 12px;
     font-size: 1.1rem;
-    background-color: #667eea;
+    background-color: rgb(40, 143, 35);
     color: white;
     border: none;
     border-radius: 5px;
@@ -307,7 +307,7 @@ button.selected:hover {
 }
 
 #step-4 .next-btn:hover {
-    background-color: #764ba2;
+    background-color: rgb(15, 54, 13);
 }
 
 /* Mejora para el campo de Nombre */
