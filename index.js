@@ -2,14 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const oracledb = require('oracledb');
-oracledb.initOracleClient({ libDir: 'C:\\oracle\\instantclient_23_5' });
+oracledb.initOracleClient({ libDir: 'C:\\Users\\Progra.CHORI1414\\Desktop\\Proyectos\\REACT\\instantclient-basic-windows.x64-23.7.0.25.01\\instantclient_23_7' });
 const path = require('path');
 const habitacionRouter = require('./routes/habitacionRouter');
 const servicioRouter = require('./routes/servicioRouter');
 const paqueteRouter = require('./routes/paqueteRouter');
 const usuarioRouter = require('./routes/usuarioRouter');
 const reservacionRouter = require('./routes/reservacionRouter');
-const paymentRouter = require('./routes/paymentRouter');  // Importar el enrutador de pagos
+const paymentRouter = require('./routes/paymentRouter');
+const cobrosExtraRouter = require('./routes/cobrosExtraRouter');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,8 +26,14 @@ if (process.env.TNS_ADMIN) {
     oracledb.initOracleClient({ configDir: process.env.TNS_ADMIN });
 }
 
+app.use(express.json()); // << ESTO ES CLAVE
+
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+app.get('/', (req, res) => {
+    res.redirect('/inicio.html');
+  });
 
 // Usar los enrutadores para las distintas rutas
 app.use('/api/habitaciones', habitacionRouter);
@@ -34,7 +41,8 @@ app.use('/api/servicios', servicioRouter);
 app.use('/api/paquetes', paqueteRouter);
 app.use('/api/usuarios', usuarioRouter);
 app.use('/api/reservaciones', reservacionRouter);
-app.use('/api/pagos', paymentRouter);  // Usar el enrutador para pagos
+app.use('/api/pagos', paymentRouter); 
+app.use('/api/cobros-extra', cobrosExtraRouter); 
 
 app.use(express.static(path.join(__dirname, 'public')));
 

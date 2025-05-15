@@ -4,7 +4,6 @@ const { getReservacionesByUsuario, updateReservacion, deleteReservacion, obtener
 const reservacionController = require('../controllers/reservacionController');
 const router = express.Router();
 
-
 router.get('/usuario', authenticateToken, getReservacionesByUsuario);
 router.post('/create', reservacionController.createReservacion);
 //router.put('/update/:id_reservacion', authenticateToken, updateReservacion);

@@ -1,9 +1,12 @@
-// routes/paymentRouter.js
 const express = require('express');
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
 
-// Ruta para procesar el pago
-router.post('/create', paymentController.createPayment);
+router.post('/', paymentController.createPayment);
+router.post('/create-intent', paymentController.crearIntentoDePago);
+router.post('/actualizar-intent', paymentController.actualizarPaymentIntent);
+router.post('/realizar-pago', paymentController.createPayment);
+router.post('/reembolso/:id', paymentController.reembolsarPago);
+
 
 module.exports = router;

@@ -5,80 +5,155 @@ let preciosServicios = {};
 let total = 0;
 let fechaEntrada = null;
 let fechaSalida = null;
-let paqueteId = null;  // Nuevo: para manejar el paquete_id
-
-let stripe, elements, cardElement;
+let paqueteId = null;
+let clientSecret = null;
+let paymentIntentId = null;
+let stripe = null;
+let elements = null;
+let cardElement = null;
 
 // Inicializar Stripe Elements
 function initializeStripeElements() {
-    if (!stripe) {
-        console.log("Inicializando Stripe Elements");
-        stripe = Stripe('pk_test_51Q9B1WRvmJhKXph8QE0FpzBgIwDpJsXa5G1t8zayNZTWYjoMbFBI6mJ1Gf9dSnDIT3xgztPNRAop9YZHyiB0CPFP00ryAjfoGg');
-        elements = stripe.elements();
+    stripe = Stripe('pk_test_51Q9a2gRqSLao4U6DhgfZrCYHn3JFpiGlbm2HD2IzfK8VO6ZkgEqwh4fRVsAzEkc6iSgxW9D7PqpEcIeHIKZs4u1I00fx9gWTuE');
+    elements = stripe.elements();
 
-        // Crear cada uno de los elementos de Stripe
-        cardNumber = elements.create('cardNumber');
-        cardExpiry = elements.create('cardExpiry');
-        cardCvc = elements.create('cardCvc');
-        cardZip = elements.create('postalCode');
+    // Crear los elementos
+    const cardNumber = elements.create('cardNumber');
+    const cardExpiry = elements.create('cardExpiry');
+    const cardCvc = elements.create('cardCvc');
+    const cardZip = elements.create('postalCode');
 
-        // Montar los elementos en sus respectivos contenedores
-        cardNumber.mount('#card-number');
-        cardExpiry.mount('#card-expiry');
-        cardCvc.mount('#card-cvc');
-        cardZip.mount('#card-zip');
+    // Montarlos en el DOM
+    cardNumber.mount('#card-number');
+    cardExpiry.mount('#card-expiry');
+    cardCvc.mount('#card-cvc');
+    cardZip.mount('#card-zip');
 
-        // Mostrar errores en tiempo real
-        cardNumber.on('change', handleCardInput);
-        cardExpiry.on('change', handleCardInput);
-        cardCvc.on('change', handleCardInput);
-        cardZip.on('change', handleCardInput);
-    }
+    // Agregar eventos para mostrar errores
+    cardNumber.on('change', handleCardInput);
+    cardExpiry.on('change', handleCardInput);
+    cardCvc.on('change', handleCardInput);
+    cardZip.on('change', handleCardInput);
+
+    // Guardar referencia para usarla luego
+    cardElement = cardNumber;
 }
+
 
 function handleCardInput(event) {
     const displayError = document.getElementById('card-errors');
     displayError.textContent = event.error ? event.error.message : '';
 }
 
-async function procesarPagoStripe() {
-    const cardholderName = document.getElementById('cardholder-name').value;
-    const { paymentMethod, error } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardNumber,
-        billing_details: {
-            name: cardholderName,
-        },
-    });
+function mostrarFormularioDePago(secret) {
+    clientSecret = secret;
 
-    if (error) {
-        document.getElementById('card-errors').textContent = error.message;
-    } else {
-        // Enviar el ID del método de pago al backend
-        const response = await fetch('/api/pagos/create', {
+    const appearance = {
+        theme: 'flat'
+    };
+    elements = stripe.elements({ appearance, clientSecret });
+
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+
+    document.getElementById('payment-section').style.display = 'block';
+
+    document.getElementById('payment-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const cardholderName = document.getElementById('cardholder-name').value;
+
+        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: elements.getElement('card'),
+                billing_details: {
+                    name: cardholderName
+                }
+            }
+        });
+
+        if (error) {
+            document.getElementById('payment-message').textContent = error.message;
+        } else if (paymentIntent.status === 'succeeded') {
+            try {
+                await confirmarReservacion(paymentIntent.id); // ← SOLO AQUÍ
+                document.getElementById('payment-message').textContent = 'Pago exitoso 🎉';
+                currentStep = 5;
+                showStep(currentStep);
+            } catch (e) {
+                document.getElementById('payment-message').textContent = 'Error al guardar la reservación después del pago.';
+            }
+        }
+    });
+}
+
+async function prepararPagoConStripe() {
+    try {
+        const response = await fetch('/api/pagos/create-intent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                payment_method_id: paymentMethod.id,
-                costo_total: total * 100,  // Stripe usa centavos
-                id_usuario: localStorage.getItem('userId')
-            })
+            body: JSON.stringify({amount: total * 100}) 
         });
 
         const result = await response.json();
 
         if (result.success) {
-            alert(result.message);  // Confirmación de pago
-            // Llamar a confirmarReservacion para crear la reserva
-            confirmarReservacion();
-            currentStep = 5;  // Avanzar al paso 5
-            showStep(currentStep);  // Mostrar el paso de confirmación
+            clientSecret = result.client_secret;
+            paymentIntentId = result.payment_intent_id;   // ← Guardás el client_secret aquí
+            console.log("PaymentIntent creado correctamente", result.payment_intent_id);
         } else {
-            alert(`Error en el pago: ${result.error}`);
+            throw new Error("No se pudo crear el PaymentIntent");
         }
+    } catch (err) {
+        console.error("Error al preparar pago con Stripe:", err);
+        alert("Error al preparar el pago. Intenta más tarde.");
     }
 }
 
+async function procesarPagoStripe() {
+    const cardholderName = document.getElementById('cardholder-name').value;
+
+    try {
+        if (!clientSecret) {
+            alert("No se ha preparado el intento de pago. Intenta de nuevo.");
+            return;
+        }
+
+        console.log("Intentando confirmar pago con clientSecret:", clientSecret);
+        console.log("Elemento de tarjeta (cardElement):", cardElement);
+        const result = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: cardElement,
+                billing_details: {
+                    name: cardholderName
+                }
+            }
+        });
+
+        console.log("Resultado de confirmCardPayment:", result);
+        if (result.error) {
+            document.getElementById('card-errors').textContent = result.error.message;
+            console.error("Error de Stripe (result.error):", result.error.message);
+            return;
+        }
+        // Si la confirmación es exitosa y no hay error
+        if (result.paymentIntent && result.paymentIntent.status === 'succeeded') {
+            console.log("Pago exitoso con Stripe:", result.paymentIntent); // Log 5
+            // Aquí llamas a tu función para guardar la reservación y actualizar la UI
+            await confirmarReservacion(result.paymentIntent.id);
+            currentStep = 5; // Avanzar al paso de confirmación
+            showStep(currentStep);
+        } else {
+            // Si paymentIntent no está 'succeeded' pero no hubo un result.error directo
+            // (Ej. requiere acción adicional, pero no debería pasar con tu config)
+            console.warn("PaymentIntent no exitoso o estado inesperado:", result.paymentIntent); // Log 6
+            document.getElementById('card-errors').textContent = 'El pago no pudo ser completado. Estado: ' + (result.paymentIntent ? result.paymentIntent.status : 'desconocido');
+        }
+    } catch (error) {
+        console.error("Error procesando el pago:", error);
+        alert("Error procesando el pago.");
+    }
+}
 
 
 // Capturar parámetros de la URL
@@ -89,63 +164,37 @@ function getQueryParams() {
     };
 }
 
-async function confirmarReservacion() {
+async function confirmarReservacion(paymentIntentId) {
     const token = localStorage.getItem('token');
-
-    if (!token) {
-        alert('Debes iniciar sesión para hacer una reservación');
-        return;
-    }
-
     const decoded = jwt_decode(token);
     const id_usuario = decoded.id || decoded.userId;
 
-    // Validar si todos los datos requeridos están presentes
-    if (!selectedHabitacion && !paqueteId) {
-        alert('Debes seleccionar una habitación o un paquete.');
-        return;
-    }
-
-    if (!fechaEntrada || !fechaSalida) {
-        alert('Debes seleccionar las fechas de entrada y salida.');
-        return;
-    }
-
-    if (!document.getElementById('metodo-pago').value) {
-        alert('Debes seleccionar un método de pago.');
-        return;
-    }
-
     const data = {
-        id_usuario: id_usuario,
+        id_usuario,
         id_habitacion: paqueteId ? null : selectedHabitacion?.id,
         id_paquete: paqueteId || null,
         costo_total: total,
-        metodo_pago: document.getElementById('metodo-pago').value,
+        metodo_pago: 'tarjeta',
         fecha_ingreso: fechaEntrada,
         fecha_salida: fechaSalida,
-        servicios: selectedServicios
+        servicios: selectedServicios,
+        payment_intent_id: paymentIntentId
     };
 
-    // Enviar la solicitud solo si todos los datos están completos
     const response = await fetch('http://localhost:3000/api/reservaciones/create', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     });
 
     const result = await response.json();
     if (response.ok) {
-        alert(result.message);  // Mostrar el mensaje de éxito enviado por el servidor
+        return result.id_reservacion;  // ← Retorna el ID
     } else {
-        console.error('Error al crear reservación:', result);
-        alert('Error: ' + result.message);
+        alert('Error al crear reservación: ' + result.message);
+        throw new Error(result.message);
     }
 }
-
-
 
 
 // Validar el formulario de pago con tarjeta
@@ -218,7 +267,7 @@ function displaySelectedHabitacionPaso4() {
 }
 
 // Modificar showStep para que llame a displaySelectedHabitacionPaso4 cuando estemos en el paso 4
-function showStep(step) {
+async function showStep(step) {
     document.querySelectorAll('.step-content').forEach((el) => {
         el.style.display = 'none';
     });
@@ -233,6 +282,7 @@ function showStep(step) {
     if (step === 4) {
         displaySelectedHabitacion(); // Llamada a la función de paso 4 específica
         initializeStripeElements(); // Inicializar Stripe Elements en el paso 4
+        await prepararPagoConStripe(); // ← Esta línea es clave
     }
 
     updateStepsIndicator(step);
@@ -584,21 +634,23 @@ function updateResumen() {
 
 // Inicializar el wizard
 function initWizard() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const habitacionId = urlParams.get('id');
+    const { paquete_id } = getQueryParams();
+    paqueteId = paquete_id;  // Asignar el paquete_id si existe
 
-    if (habitacionId) {
-        // Seleccionar automáticamente la habitación si el ID está en la URL
-        selectHabitacionPorId(habitacionId);
+    if (paqueteId) {
+        // Si es una reservación para un paquete, no pedimos seleccionar habitación
+        console.log(`Reservando con el paquete: ${paqueteId}`);
+        document.getElementById('habitaciones-container').style.display = 'none';
+        loadServicios();  // Cargar solo los servicios
+    } else {
+        loadHabitaciones();
+        loadServicios();
     }
 
-    setMinFechaEntrada();  // Establecer la fecha mínima en los campos de fecha
-    loadHabitaciones();
-    loadServicios();
-    
-    // No calcular precio hasta que se seleccionen las fechas
-    showStep(1);
+    setMinFechaEntrada();
+    showStep(1);  // Mostrar el primer paso del wizard
 }
+
 
 
 function selectHabitacionPorId(id) {
@@ -629,34 +681,10 @@ fetch(`/api/habitaciones/${id}`)
 }
 
 
-// Función para inicializar el wizard y manejar la lógica según el paquete_id
-document.addEventListener('DOMContentLoaded', () => {
-    const { paquete_id } = getQueryParams();
-    paqueteId = paquete_id;  // Asignar el paquete_id si existe
-
-    if (paqueteId) {
-        // Si es una reservación para un paquete, no pedimos seleccionar habitación
-        console.log(`Reservando con el paquete: ${paqueteId}`);
-        
-        // Omitir selección de habitación y pasar directamente a fechas y pago
-        document.getElementById('habitaciones-container').style.display = 'none';
-        cargarServicios();  // Cargar solo los servicios
-    } else {
-        // Mostrar la lógica normal de selección de habitación si no hay paquete
-        loadHabitaciones();
-        loadServicios();
-    }
-
-    setMinFechaEntrada();  // Establecer la fecha mínima en los campos de fecha
-    showStep(1);
-});
-
 // Función para verificar si el usuario ha iniciado sesión
 function isAuthenticated() {
     const token = localStorage.getItem('token');
     return token !== null; // Si hay un token en el localStorage, consideramos que el usuario está autenticado
 }
-
-
 
 document.addEventListener('DOMContentLoaded', initWizard);

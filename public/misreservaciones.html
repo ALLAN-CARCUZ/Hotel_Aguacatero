@@ -8,38 +8,55 @@
     <link rel="stylesheet" href="css/habitacion.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/reservaciones.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
     <header>
-    </header>
-    
+        </header>
 
     <div id="updateModal" class="modal">
         <div class="modal-content">
             <span id="closeUpdateModal" class="close">&times;</span>
-            <div id="updateFormContainer"></div> <!-- Aquí cargará el formulario -->
+            <div id="updateFormContainer">
+                <div id="stripe-payment-form-extra" style="display:none; margin-top: 20px; border-top: 1px solid #ccc; padding-top: 15px;">
+                    <h4>Realizar Pago Adicional</h4>
+                    <label for="cardholder-name-extra">Nombre en la tarjeta</label>
+                    <input type="text" id="cardholder-name-extra" placeholder="Nombre completo" required>
+
+                    <label for="card-number-extra">Número de tarjeta</label>
+                    <div id="card-number-extra" class="input-field"></div>
+
+                    <div class="form-row" style="display: flex; justify-content: space-between;">
+                        <div style="width: 48%;">
+                            <label for="card-expiry-extra">Fecha de Expiración</label>
+                            <div id="card-expiry-extra" class="input-field"></div>
+                        </div>
+                        <div style="width: 48%;">
+                            <label for="card-cvc-extra">CVC</label>
+                            <div id="card-cvc-extra" class="input-field"></div>
+                        </div>
+                    </div>
+                    <label for="card-zip-extra">Código Postal</label>
+                    <div id="card-zip-extra" class="input-field"></div>
+                    <div id="card-errors-extra" role="alert" style="color: red; margin-top: 10px;"></div>
+                    <button type="button" id="pay-extra-charge-button" style="margin-top: 15px;">Pagar Monto Adicional</button>
+                </div>
+            </div>
         </div>
     </div>
-    
-    
-    
 
-   
     <h1 style="margin-top: 30px; text-align: center; font-size: 2em;">Mis Reservaciones</h1>
     <div id="reservacionesContainer">
-        <!-- Aquí se cargarán las reservaciones del usuario -->
-    </div>
-    
-        <!-- Footer -->
-        <footer>
-            <p>© 2025 Hotel El Aguacatero. Todos los derechos reservados.</p>
-        </footer>
+        </div>
+
+    <footer>
+        <p>© 2025 Hotel El Aguacatero. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://js.stripe.com/v3/"></script>             <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script src="scripts/misreservaciones.js"></script>
     <script src="scripts/scriptreservacionesauth.js"></script>
-    <script src="scripts/header.js"></script> 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-</body>
+    <script src="scripts/header.js"></script>
+    </body>
 </html>

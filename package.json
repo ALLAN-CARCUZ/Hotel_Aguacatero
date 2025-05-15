@@ -3,10 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prestart": "./download_instantclient.sh",
-    "start": "node index.js",
-    "postinstall": "./download_instantclient.sh"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +11,7 @@
   "description": "",
   "dependencies": {
     "@stripe/react-stripe-js": "^2.8.1",
-    "@stripe/stripe-js": "^4.9.0",
+    "@stripe/stripe-js": "^4.10.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
@@ -29,9 +26,8 @@
     "passport-local": "^1.0.0",
     "sequelize": "^6.37.4",
     "sequelize-oracle": "^3.3.2-0.0",
-    "stripe": "^17.2.1"
+    "stripe": "^17.7.0"
   },
-
   "devDependencies": {
     "sequelize-cli": "^6.6.2"
   }
