@@ -148,7 +148,7 @@ document.getElementById('download-pdf').addEventListener('click', async () => {
 
 
     <script>
-        fetch('/api/reservaciones/promedio/promedio-dias')
+        fetch('https://hotelaguacatero-production.up.railway.app/api/reservaciones/promedio/promedio-dias')
             .then(response => response.json())
             .then(data => {
                 document.getElementById('promedio-dias').innerText = `${data.promedio.toFixed(1)} días`; // Muestra el promedio con un decimal
@@ -161,7 +161,7 @@ document.getElementById('download-pdf').addEventListener('click', async () => {
 
     <script>
         // Hacer la solicitud a la API para obtener los datos de reservaciones por mes
-        fetch('/api/reservaciones/mensuales/reservaciones-por-mes')
+        fetch('https://hotelaguacatero-production.up.railway.app/api/reservaciones/mensuales/reservaciones-por-mes')
         .then(response => response.json())
     .then(data => {
         // Mapear los números de meses a nombres
@@ -204,7 +204,7 @@ document.getElementById('download-pdf').addEventListener('click', async () => {
 
     <script>
         // Hacer la solicitud a la API para obtener los datos de usuarios por país
-        fetch('/api/usuarios/usuarios-por-pais')
+        fetch('https://hotelaguacatero-production.up.railway.app/api/usuarios/usuarios-por-pais')
             .then(response => response.json())
             .then(data => {
                 var ctx = document.getElementById('usuariosPaisChart').getContext('2d');
@@ -237,7 +237,7 @@ document.getElementById('download-pdf').addEventListener('click', async () => {
 
     <script>
         // Hacer la solicitud a la API para obtener los datos de habitaciones más reservadas
-        fetch('/api/habitaciones/reservadas/habitaciones-mas-reservadas')
+        fetch('https://hotelaguacatero-production.up.railway.app/api/habitaciones/reservadas/habitaciones-mas-reservadas')
             .then(response => response.json())
             .then(data => {
                 var ctx = document.getElementById('habitacionesChart').getContext('2d');
@@ -268,7 +268,7 @@ document.getElementById('download-pdf').addEventListener('click', async () => {
 
     <script>
         // Cargar la cantidad total de ingresos
-        fetch('/api/reservaciones/ingreso/ingresos-total')
+        fetch('https://hotelaguacatero-production.up.railway.app/api/reservaciones/ingreso/ingresos-total')
             .then(response => response.json())
             .then(data => {
                 document.getElementById('total-ingresos').textContent = `$${data.totalIngresos}`;
@@ -279,7 +279,7 @@ document.getElementById('download-pdf').addEventListener('click', async () => {
 
     <script>
         // Cargar la gráfica de servicios más utilizados
-        fetch('/api/servicios/servicios-mas-utilizados')
+        fetch('https://hotelaguacatero-production.up.railway.app/api/servicios/servicios-mas-utilizados')
             .then(response => response.json())
             .then(data => {
                 var ctx = document.getElementById('serviciosChart').getContext('2d');
@@ -307,7 +307,7 @@ document.getElementById('download-pdf').addEventListener('click', async () => {
             .catch(error => console.error('Error al obtener los datos:', error));
 
         // Cargar la cantidad de usuarios
-        fetch('/api/usuarios/cantidad')
+        fetch('https://hotelaguacatero-production.up.railway.app/api/usuarios/cantidad')
             .then(response => response.json())
             .then(data => {
                 document.getElementById('cantidad-usuarios').textContent = data.cantidad;
@@ -320,7 +320,7 @@ document.getElementById('download-pdf').addEventListener('click', async () => {
 
     <script>
         // Hacer la solicitud a la API para obtener los datos
-        fetch('/api/servicios/servicios-mas-utilizados')
+        fetch('https://hotelaguacatero-production.up.railway.app/api/servicios/servicios-mas-utilizados')
           .then(response => response.json())
           .then(data => {
               var ctx = document.getElementById('serviciosChart').getContext('2d');

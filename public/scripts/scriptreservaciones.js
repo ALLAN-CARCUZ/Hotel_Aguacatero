@@ -22,7 +22,7 @@ document.getElementById('openRegisterModal').style.display = (rol === 'admin') ?
 // Función para cargar habitaciones y servicios en el formulario de actualización
 async function cargarDatosFormularioActualizacion(reservacion) {
     try {
-        const response = await fetch('/api/paquetes/datos/formulario');
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/paquetes/datos/formulario');
         const { habitaciones, servicios } = await response.json();
 
         const habitacionSelect = document.getElementById('newIdHabitacion');
@@ -129,7 +129,7 @@ async function updateReservacion(id, id_habitacion, servicios, costo_total, meto
 // Función para cargar las reservaciones y mostrarlas en la lista
 async function cargarReservaciones() {
     try {
-        const response = await fetch('/api/reservaciones');
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/reservaciones');
         const reservaciones = await response.json();
 
         const reservacionesList = document.getElementById('reservaciones-list');

@@ -89,7 +89,7 @@ function mostrarFormularioDePago(secret) {
 
 async function prepararPagoConStripe() {
     try {
-        const response = await fetch('/api/pagos/create-intent', {
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/pagos/create-intent', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({amount: total * 100}) 
@@ -181,7 +181,7 @@ async function confirmarReservacion(paymentIntentId) {
         payment_intent_id: paymentIntentId
     };
 
-    const response = await fetch('http://localhost:3000/api/reservaciones/create', {
+    const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/reservaciones/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -345,7 +345,7 @@ function updateStepsIndicator(step) {
 
 // Cargar habitaciones desde la API
 function loadHabitaciones() {
-    fetch('/api/habitaciones')
+    fetch('https://hotelaguacatero-production.up.railway.app/api/habitaciones')
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById('habitaciones-container');
@@ -515,7 +515,7 @@ async function setMinFechaEntrada() {
 
 // Cargar servicios desde la API
 function loadServicios() {
-    fetch('/api/servicios')
+    fetch('https://hotelaguacatero-production.up.railway.app/api/servicios')
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById('servicios-container');

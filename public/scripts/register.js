@@ -11,7 +11,7 @@ document.getElementById('usuarioForm').addEventListener('submit', async function
     console.log('País seleccionado en el frontend:', pais);  
 
     try {
-        const response = await fetch('/api/usuarios/register', {
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/usuarios/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

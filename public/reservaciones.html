@@ -39,7 +39,7 @@
     <script>
         async function cargarReservaciones() {
             try {
-                const response = await fetch('/api/reservaciones');
+                const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/reservaciones');
                 const reservaciones = await response.json();
 
                 const reservacionesList = document.getElementById('reservaciones-list');

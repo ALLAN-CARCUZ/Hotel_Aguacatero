@@ -77,7 +77,7 @@ function calcularPrecioTotal(event) {
 // Función para cargar habitaciones y servicios en el formulario de registro
 async function cargarDatosFormulario() {
     try {
-        const response = await fetch('/api/paquetes/datos/formulario');
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/paquetes/datos/formulario');
         const { habitaciones, servicios } = await response.json();
 
         // Cargar habitaciones en el select
@@ -148,7 +148,7 @@ function redirigirAReservacion(idPaquete) {
 // Función para cargar los paquetes y mostrarlos en la lista
 async function loadPaquetes() {
     try {
-        const response = await fetch('/api/paquetes');
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/paquetes');
         const paquetes = await response.json();
 
         const paqueteList = document.getElementById('paqueteList');
@@ -301,7 +301,7 @@ async function loadPaquetes() {
 // Función para cargar habitaciones y servicios en el formulario de actualización
 async function cargarDatosFormularioActualizacion(paquete) {
     try {
-        const response = await fetch('/api/paquetes/datos/formulario');
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/paquetes/datos/formulario');
         const { habitaciones, servicios } = await response.json();
 
         // Cargar habitaciones en el select
@@ -462,7 +462,7 @@ async function registrarPaquete(nombre, descripcion, precio, imagenBase64, habit
     try {
         const descuento = parseFloat(document.getElementById('descuento').value) || 0;
         // Enviar los datos a la API
-        const response = await fetch('/api/paquetes/create', {
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/paquetes/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

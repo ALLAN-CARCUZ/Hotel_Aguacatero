@@ -30,7 +30,7 @@ document.getElementById('closeUpdateModal').addEventListener('click', () => clos
 
 async function loadHabitaciones() {
     try {
-        const response = await fetch('/api/habitaciones');
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/habitaciones');
         const habitaciones = await response.json();
 
         // Obtener el rol del usuario desde localStorage
@@ -232,7 +232,7 @@ document.getElementById('habitacionForm').addEventListener('submit', async funct
 async function registrarHabitacion(nombre, descripcion, precio, imagenBase64) {
     try {
         // Enviar los datos a la API
-        const response = await fetch('/api/habitaciones/create', {
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/habitaciones/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

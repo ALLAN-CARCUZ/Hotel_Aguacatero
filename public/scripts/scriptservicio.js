@@ -26,7 +26,7 @@ document.getElementById('closeUpdateModal').addEventListener('click', () => clos
 // Función para cargar los servicios y mostrarlos en la lista
 async function loadServicios() {
     try {
-        const response = await fetch('/api/servicios');
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/servicios');
         const servicios = await response.json();
 
         // Limpiar la lista antes de mostrar los servicios
@@ -198,7 +198,7 @@ document.getElementById('servicioForm').addEventListener('submit', async functio
 
 async function registrarServicio(nombre, descripcion, costo, imagenBase64) {
     try {
-        const response = await fetch('/api/servicios/create', {
+        const response = await fetch('https://hotelaguacatero-production.up.railway.app/api/servicios/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
