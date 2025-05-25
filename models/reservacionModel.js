@@ -441,7 +441,7 @@ async function getReservacionesPorMes() {
         const result = await connection.execute(`
             SELECT TO_CHAR(FECHA_RESERVACION, 'MM') AS MES, COUNT(*) AS CANTIDAD
             FROM RESERVACIONES
-            WHERE TO_CHAR(FECHA_RESERVACION, 'YYYY') = '2024'
+            WHERE TO_CHAR(FECHA_RESERVACION, 'YYYY') = '2025'
             GROUP BY TO_CHAR(FECHA_RESERVACION, 'MM')
             ORDER BY MES
         `);
