@@ -13,7 +13,7 @@ try {
   console.warn('Saltando initOracleClient: probablemente estás en producción.');
 }
 
-// Rutas
+// Routers
 const habitacionRouter = require('./routes/habitacionRouter');
 const servicioRouter = require('./routes/servicioRouter');
 const paqueteRouter = require('./routes/paqueteRouter');
@@ -33,16 +33,19 @@ const dbConfig = {
   externalAuth: false
 };
 
+console.log("🔍 ORACLE_CONNECTION:", process.env.ORACLE_CONNECTION); // ✅ Diagnóstico
+if (!process.env.ORACLE_CONNECTION) {
+  console.error("❌ ERROR: ORACLE_CONNECTION está vacío o no se ha definido."); // ✅ Aviso
+}
+
 app.use(express.json());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-// Redirección a HTML de inicio
 app.get('/', (req, res) => {
   res.redirect('/inicio.html');
 });
 
-// Rutas
 app.use('/api/habitaciones', habitacionRouter);
 app.use('/api/servicios', servicioRouter);
 app.use('/api/paquetes', paqueteRouter);
@@ -51,7 +54,6 @@ app.use('/api/reservaciones', reservacionRouter);
 app.use('/api/pagos', paymentRouter); 
 app.use('/api/cobros-extra', cobrosExtraRouter); 
 
-// Servir archivos estáticos desde /public
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexión de prueba a Oracle
@@ -78,6 +80,7 @@ connectToDatabase();
 app.listen(port, () => {
   console.log(`🚀 Servidor corriendo en el puerto ${port}`);
 });
+
 
 
 //ORACLE_USER=ADMIN
