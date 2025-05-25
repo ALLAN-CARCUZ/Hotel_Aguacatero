@@ -3,7 +3,7 @@ const { getUserById } = require('../models/usuarioModel');
 const { getServicioById } = require('../models/servicioModel');
 const nodemailer = require('nodemailer');
 console.log("Stripe key:", process.env.STRIPE_SECRET_KEY);
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe');
 const oracledb = require('oracledb');
 const dbConfig = { // O importa tu configuración de dbConfig
     user: process.env.ORACLE_USER,
@@ -21,6 +21,7 @@ const transporter = nodemailer.createTransport({
 });
 
 async function createReservacion(req, res) {
+    const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
     // Añadir payment_intent_id a la desestructuración
     const { id_usuario, id_habitacion, id_paquete, costo_total, metodo_pago, fecha_ingreso, fecha_salida, servicios = [], payment_intent_id } = req.body;
 
@@ -168,6 +169,7 @@ async function deleteReservacion(req, res) {
 
     let connection;
     try {
+        const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
         connection = await oracledb.getConnection(dbConfig);
         // No hay connection.begin() en node-oracledb, la transacción se maneja con commit/rollback
 
