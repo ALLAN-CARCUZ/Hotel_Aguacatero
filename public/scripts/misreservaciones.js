@@ -1,5 +1,5 @@
 // Constante base para la API
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://hotelaguacatero-production.up.railway.app/api';
 
 // Variables para almacenar los precios de habitaciones y servicios
 let preciosHabitaciones = {};
