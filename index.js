@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const oracledb = require('oracledb');
-oracledb.initOracleClient({ libDir: 'C:\\Users\\Progra.CHORI1414\\Desktop\\Proyectos\\REACT\\instantclient-basic-windows.x64-23.7.0.25.01\\instantclient_23_7' });
+oracledb.initOracleClient({ libDir: 'C:\\oracle\\instantclient_23_5' });
 const path = require('path');
 const habitacionRouter = require('./routes/habitacionRouter');
 const servicioRouter = require('./routes/servicioRouter');
