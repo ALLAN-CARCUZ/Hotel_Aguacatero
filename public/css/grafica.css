@@ -121,7 +121,7 @@ body {
 footer {
     margin-top: auto;
     background: linear-gradient(to right, #feffd4d4, #feffd4d4);
-    color: white;
+    color: rgb(0, 0, 0);
     text-align: center;
     padding: 20px 0;
     width: 100%;
