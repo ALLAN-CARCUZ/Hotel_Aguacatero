@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe');
 const oracledb = require('oracledb');
 const dbConfig = {
     user: process.env.ORACLE_USER,
@@ -15,6 +15,7 @@ async function CobroDiasExtra(req, res) {
 
     let connection;
     try {
+        const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
         connection = await oracledb.getConnection(dbConfig);
 
         const reservacionResult = await connection.execute(
@@ -111,6 +112,7 @@ async function CobroExtra(req, res) {
 
 async function realizarCobroExtra(req, res, connection) {
     const { id_reservacion, nuevo_costo_total } = req.body;
+    const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
 
     const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(nuevo_costo_total * 100), // Stripe usa centavos
@@ -143,6 +145,7 @@ async function solicitarPagoModificacionController(req, res) {
     }
 
     try {
+        const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
         const paymentIntent = await stripe.paymentIntents.create({
             amount: monto_adicional_en_centavos,
             currency: 'usd', // o 'gtq' si es la moneda correcta
