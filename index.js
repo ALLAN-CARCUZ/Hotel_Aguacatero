@@ -41,7 +41,6 @@ if (!process.env.ORACLE_CONNECTION) {
   console.error("❌ ERROR: ORACLE_CONNECTION está vacío o no se ha definido."); // ✅ Aviso
 }
 
-app.use(express.json());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
