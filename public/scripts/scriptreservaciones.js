@@ -105,7 +105,7 @@ function calcularPrecioTotal() {
 // Función para actualizar una reservación
 async function updateReservacion(id, id_habitacion, servicios, costo_total, metodo_pago, fecha_ingreso, fecha_salida) {
     try {
-        const response = await fetch(`/api/reservaciones/update/${id}`, {
+        const response = await fetch(`https://hotelaguacatero-production.up.railway.app/api/reservaciones/update/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -211,7 +211,7 @@ async function cargarReservaciones() {
 // Función para eliminar una reservación
 async function deleteReservacion(id) {
     try {
-        const response = await fetch(`/api/reservaciones/delete/${id}`, {
+        const response = await fetch(`https://hotelaguacatero-production.up.railway.app/api/reservaciones/delete/${id}`, {
             method: 'DELETE'
         });
 

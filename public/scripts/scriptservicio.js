@@ -124,7 +124,7 @@ async function loadServicios() {
 // Función para actualizar un servicio
 async function updateServicio(id, nombre, descripcion, costo, imagen) {
     try {
-        const response = await fetch(`/api/servicios/update/${id}`, {
+        const response = await fetch(`https://hotelaguacatero-production.up.railway.app/api/servicios/update/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -148,7 +148,7 @@ async function updateServicio(id, nombre, descripcion, costo, imagen) {
 // Función para eliminar un servicio
 async function deleteServicio(id) {
     try {
-        const response = await fetch(`/api/servicios/delete/${id}`, {
+        const response = await fetch(`https://hotelaguacatero-production.up.railway.app/api/servicios/delete/${id}`, {
             method: 'DELETE'
         });
 

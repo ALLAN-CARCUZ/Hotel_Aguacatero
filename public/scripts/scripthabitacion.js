@@ -156,7 +156,7 @@ function irAWizard(habitacionId) {
 // Función para actualizar una habitación
 async function updateHabitacion(id, nombre, descripcion, precio, imagen) {
     try {
-        const response = await fetch(`/api/habitaciones/update/${id}`, {
+        const response = await fetch(`https://hotelaguacatero-production.up.railway.app/api/habitaciones/update/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -180,7 +180,7 @@ async function updateHabitacion(id, nombre, descripcion, precio, imagen) {
 // Función para eliminar una habitación
 async function deleteHabitacion(id) {
     try {
-        const response = await fetch(`/api/habitaciones/delete/${id}`, {
+        const response = await fetch(`https://hotelaguacatero-production.up.railway.app/api/habitaciones/delete/${id}`, {
             method: 'DELETE'
         });
 

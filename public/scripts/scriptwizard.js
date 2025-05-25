@@ -577,7 +577,7 @@ function calcularPrecioTotal() {
     });
 
     if (paqueteId) {
-        fetch(`/api/paquetes/${paqueteId}`)
+        fetch(`https://hotelaguacatero-production.up.railway.app/api/paquetes/${paqueteId}`)
             .then(response => response.json())
             .then(paquete => {
                 total = (paquete.precio * cantidadNoches) + totalServicios;
@@ -654,7 +654,7 @@ function initWizard() {
 
 
 function selectHabitacionPorId(id) {
-fetch(`/api/habitaciones/${id}`)
+fetch(`https://hotelaguacatero-production.up.railway.app/api/habitaciones/${id}`)
     .then(response => {
         if (!response.ok) {
             throw new Error(`Error al obtener la habitación: ${response.statusText}`);

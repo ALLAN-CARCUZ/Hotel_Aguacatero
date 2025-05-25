@@ -375,7 +375,7 @@ document.getElementById('updateDescuento').value = paquete.descuento || 0;
 // Función para actualizar un paquete
 async function updatePaquete(id, nombre, descripcion, precio, imagen, habitacion_id, servicios, descuento) {
     try {
-        const response = await fetch(`/api/paquetes/update/${id}`, {
+        const response = await fetch(`https://hotelaguacatero-production.up.railway.app/api/paquetes/update/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -400,7 +400,7 @@ async function updatePaquete(id, nombre, descripcion, precio, imagen, habitacion
 // Función para eliminar un paquete
 async function deletePaquete(id) {
     try {
-        const response = await fetch(`/api/paquetes/delete/${id}`, {
+        const response = await fetch(`https://hotelaguacatero-production.up.railway.app/api/paquetes/delete/${id}`, {
             method: 'DELETE'
         });
 
