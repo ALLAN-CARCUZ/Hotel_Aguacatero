@@ -13,7 +13,7 @@ async function createServicio(nombre, descripcion, costo, imagen) {
         connection = await oracledb.getConnection(dbConfig);
         const result = await connection.execute(
             `INSERT INTO servicios (id, nombre, descripcion, costo, imagen) 
-             VALUES (servicios_seq.NEXTVAL, :nombre, :descripcion, :costo, :imagen)`,
+             VALUES (ADMIN.SEQ_SERVICIOS.NEXTVAL, :nombre, :descripcion, :costo, :imagen)`,
             { 
                 nombre, 
                 descripcion, 

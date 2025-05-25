@@ -49,7 +49,7 @@ async function createUsuario(nombre, apellido, email, password, pais) {
 
         const result = await connection.execute(
             `INSERT INTO usuarios (id, nombre, apellido, email, password, rol, pais) 
-             VALUES (usuarios_seq.NEXTVAL, :nombre, :apellido, :email, :password, :rol, :pais)`,
+             VALUES (ADMIN.SEQ_USUARIOS.NEXTVAL, :nombre, :apellido, :email, :password, :rol, :pais)`,
             { nombre, apellido, email, password: hashedPassword, rol, pais },
             { autoCommit: true }
         );

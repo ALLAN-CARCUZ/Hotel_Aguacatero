@@ -15,7 +15,7 @@ async function createReservacion(id_usuario, id_habitacion, id_paquete, costo_to
         if (id_paquete) {
             query = `
                 INSERT INTO RESERVACIONES (ID_RESERVACION, ID_USUARIO, ID_PAQUETE, COSTO_TOTAL, METODO_PAGO, FECHA_INGRESO, FECHA_SALIDA, FECHA_RESERVACION, PAYMENT_INTENT_ID)
-                VALUES (reservaciones_seq.NEXTVAL, :id_usuario, :id_paquete, :costo_total, :metodo_pago, TO_DATE(:fecha_ingreso, 'YYYY-MM-DD'), TO_DATE(:fecha_salida, 'YYYY-MM-DD'), SYSDATE, :payment_intent_id)
+                VALUES (ADMIN.SEQ_RESERVACIONES.NEXTVAL, :id_usuario, :id_paquete, :costo_total, :metodo_pago, TO_DATE(:fecha_ingreso, 'YYYY-MM-DD'), TO_DATE(:fecha_salida, 'YYYY-MM-DD'), SYSDATE, :payment_intent_id)
                 RETURNING ID_RESERVACION INTO :id_reservacion
             `;
             binds = {
@@ -26,7 +26,7 @@ async function createReservacion(id_usuario, id_habitacion, id_paquete, costo_to
         } else {
             query = `
                 INSERT INTO RESERVACIONES (ID_RESERVACION, ID_USUARIO, ID_HABITACION, COSTO_TOTAL, METODO_PAGO, FECHA_INGRESO, FECHA_SALIDA, FECHA_RESERVACION, PAYMENT_INTENT_ID)
-                VALUES (reservaciones_seq.NEXTVAL, :id_usuario, :id_habitacion, :costo_total, :metodo_pago, TO_DATE(:fecha_ingreso, 'YYYY-MM-DD'), TO_DATE(:fecha_salida, 'YYYY-MM-DD'), SYSDATE, :payment_intent_id)
+                VALUES (ADMIN.SEQ_RESERVACIONES.NEXTVAL, :id_usuario, :id_habitacion, :costo_total, :metodo_pago, TO_DATE(:fecha_ingreso, 'YYYY-MM-DD'), TO_DATE(:fecha_salida, 'YYYY-MM-DD'), SYSDATE, :payment_intent_id)
                 RETURNING ID_RESERVACION INTO :id_reservacion
             `;
             binds = {

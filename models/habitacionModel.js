@@ -12,7 +12,7 @@ async function createHabitacion(nombre, descripcion, precio, imagen) {
         connection = await oracledb.getConnection(dbConfig);
         const result = await connection.execute(
             `INSERT INTO habitaciones (id, nombre, descripcion, precio, imagen) 
-             VALUES (habitaciones_seq.NEXTVAL, :nombre, :descripcion, :precio, :imagen)`,
+             VALUES (ADMIN.SEQ_HABITACIONES.NEXTVAL, :nombre, :descripcion, :precio, :imagen)`,
             { 
                 nombre, 
                 descripcion, 

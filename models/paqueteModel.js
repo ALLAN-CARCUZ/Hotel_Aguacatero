@@ -15,7 +15,7 @@ async function createPaquete(nombre, descripcion, precio, imagen, habitacion_id,
         // Insertar en la tabla 'paquetes'
         const paqueteResult = await connection.execute(
             `INSERT INTO paquetes (id, nombre, descripcion, precio, imagen, habitacion_id, descuento)
-             VALUES (paquetes_seq.NEXTVAL, :nombre, :descripcion, :precio, :imagen, :habitacion_id, :descuento)
+             VALUES (ADMIN.SEQ_PAQUETES.NEXTVAL, :nombre, :descripcion, :precio, :imagen, :habitacion_id, :descuento)
              RETURNING id INTO :id`,
             {
                 nombre,
