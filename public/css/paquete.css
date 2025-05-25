@@ -186,3 +186,17 @@ footer {
     background-color: rgba(220, 53, 69, 0.1); /* Fondo ligero al pasar el cursor */
     color: #c82333; /* Color más oscuro al pasar el cursor */
 }
+
+.modal-content {
+    max-height: 90vh; /* Altura máxima relativa a la ventana */
+    overflow-y: auto; /* Scroll interno si el contenido sobrepasa */
+    margin-top: 5vh;  /* Separación desde la parte superior */
+    position: relative;
+}
+@media screen and (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+        padding: 15px;
+    }
+}
