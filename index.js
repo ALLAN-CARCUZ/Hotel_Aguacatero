@@ -2,8 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const oracledb = require('oracledb');
-oracledb.initOracleClient({ libDir: 'C:\\oracle\\instantclient_23_5' });
 const path = require('path');
+
+// Evitar fallo en Railway (no usar Instant Client en producción)
+try {
+  if (process.env.NODE_ENV === 'development') {
+    oracledb.initOracleClient({ libDir: 'C:\\oracle\\instantclient_23_5' });
+  }
+} catch (err) {
+  console.warn('Saltando initOracleClient: probablemente estás en producción.');
+}
+
+// Rutas
 const habitacionRouter = require('./routes/habitacionRouter');
 const servicioRouter = require('./routes/servicioRouter');
 const paqueteRouter = require('./routes/paqueteRouter');
@@ -15,27 +25,24 @@ const cobrosExtraRouter = require('./routes/cobrosExtraRouter');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Configuración de conexión a Oracle
 const dbConfig = {
-    user: process.env.ORACLE_USER,
-    password: process.env.ORACLE_PASSWORD,
-    connectString: process.env.ORACLE_CONNECTION,
-    externalAuth: false
+  user: process.env.ORACLE_USER,
+  password: process.env.ORACLE_PASSWORD,
+  connectString: process.env.ORACLE_CONNECTION,
+  externalAuth: false
 };
 
-if (process.env.TNS_ADMIN) {
-    oracledb.initOracleClient({ configDir: process.env.TNS_ADMIN });
-}
-
-app.use(express.json()); // << ESTO ES CLAVE
-
+app.use(express.json());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+// Redirección a HTML de inicio
 app.get('/', (req, res) => {
-    res.redirect('/inicio.html');
-  });
+  res.redirect('/inicio.html');
+});
 
-// Usar los enrutadores para las distintas rutas
+// Rutas
 app.use('/api/habitaciones', habitacionRouter);
 app.use('/api/servicios', servicioRouter);
 app.use('/api/paquetes', paqueteRouter);
@@ -44,35 +51,32 @@ app.use('/api/reservaciones', reservacionRouter);
 app.use('/api/pagos', paymentRouter); 
 app.use('/api/cobros-extra', cobrosExtraRouter); 
 
+// Servir archivos estáticos desde /public
 app.use(express.static(path.join(__dirname, 'public')));
 
-console.log("LD_LIBRARY_PATH:", process.env.LD_LIBRARY_PATH);
-
-
-// Ejemplo de conexión a la base de datos Oracle
+// Conexión de prueba a Oracle
 async function connectToDatabase() {
-    let connection;
-    try {
-        connection = await oracledb.getConnection(dbConfig);
-        console.log('Conexión a Oracle exitosa');
-    } catch (err) {
-        console.error('Error al conectar a la base de datos:', err);
-    } finally {
-        if (connection) {
-            try {
-                await connection.close();
-            } catch (err) {
-                console.error('Error al cerrar la conexión:', err);
-            }
-        }
+  let connection;
+  try {
+    connection = await oracledb.getConnection(dbConfig);
+    console.log('✅ Conexión a Oracle exitosa');
+  } catch (err) {
+    console.error('❌ Error al conectar a la base de datos:', err);
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error('Error al cerrar la conexión:', err);
+      }
     }
+  }
 }
 
 connectToDatabase();
 
-// Iniciar el servidor
 app.listen(port, () => {
-    console.log(`Servidor corriendo en el puerto ${port}`);
+  console.log(`🚀 Servidor corriendo en el puerto ${port}`);
 });
 
 
