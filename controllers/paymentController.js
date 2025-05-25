@@ -1,5 +1,5 @@
-const oracledb = require('oracledb'); // Agrega esta línea si no estaba
-const stripe = require('stripe');
+const oracledb = require('oracledb');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // ✔️ Uso correcto de Stripe
 
 const dbConfig = {
     user: process.env.ORACLE_USER,
@@ -11,7 +11,6 @@ exports.crearIntentoDePago = async (req, res) => {
     const { amount } = req.body;
 
     try {
-        const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
         const intent = await stripe.paymentIntents.create({
             amount,
             currency: 'usd',
@@ -29,14 +28,12 @@ exports.crearIntentoDePago = async (req, res) => {
     }
 };
 
-
 exports.createPayment = async (req, res) => {
     const { payment_method_id, costo_total, id_usuario, id_reservacion } = req.body;
     console.log("Datos recibidos en el backend:", req.body);
 
     let connection;
     try {
-        const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
         if (!payment_method_id || !costo_total || !id_usuario || !id_reservacion) {
             throw new Error("Faltan datos necesarios para el pago.");
         }
@@ -92,7 +89,6 @@ exports.reembolsarPago = async (req, res) => {
 
     let connection;
     try {
-        const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
         connection = await oracledb.getConnection(dbConfig);
 
         const result = await connection.execute(
@@ -114,7 +110,6 @@ exports.reembolsarPago = async (req, res) => {
             payment_intent: payment_intent_id
         });
 
-        // GUARDAR el ID del reembolso en STRIPE_PAYMENT_ID
         await connection.execute(
             `UPDATE reservaciones SET stripe_payment_id = :stripe_payment_id WHERE id_reservacion = :id_reservacion`,
             {
@@ -133,7 +128,6 @@ exports.reembolsarPago = async (req, res) => {
         if (connection) await connection.close();
     }
 };
-
 
 exports.actualizarPaymentIntent = async (req, res) => {
     console.log('BODY RECIBIDO:', req.body);
