@@ -109,7 +109,7 @@ body {
 }
 
 .search-button {
-    background: linear-gradient(to right, #667eea, #764ba2);
+    background: linear-gradient(to right, rgb(40, 143, 35), rgb(15, 54, 13));
     color: white;
     padding: 10px 20px;
     border: none;
@@ -120,7 +120,7 @@ body {
 }
 
 .search-button:hover {
-    background: linear-gradient(to right, #764ba2, #667eea);
+    background: linear-gradient(to right, rgb(15, 54, 13), rgb(40, 143, 35));
 }
 
 

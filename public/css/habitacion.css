@@ -135,7 +135,7 @@ footer {
 .modal-content input[type="file"]:focus,
 .modal-content textarea:focus,
 .modal-content select:focus {
-    border-color: #667eea;
+    border-color: rgb(40, 143, 35);
 }
 
 .modal-content textarea {
@@ -144,7 +144,7 @@ footer {
 
 .modal-content button {
     width: 100%;
-    background: linear-gradient(to right, #667eea, #764ba2);
+    background: linear-gradient(to right, rgb(40, 143, 35), rgb(15, 54, 13));
     color: white;
     border: none;
     padding: 12px;
@@ -155,7 +155,7 @@ footer {
 }
 
 .modal-content button:hover {
-    background: linear-gradient(to right, #764ba2, #667eea);
+    background: linear-gradient(to right, rgb(15, 54, 13), rgb(40, 143, 35));
 }
 
 

@@ -57,7 +57,7 @@ h1 {
 }
 
 .reservacion-header {
-    background: #764ba2; /* Un color de acento, puedes cambiarlo */
+    background: rgb(15, 54, 13); /* Un color de acento, puedes cambiarlo */
     color: white;
     padding: 15px;
     text-align: center;
@@ -241,7 +241,7 @@ h1 {
 
 /* Botón "Guardar cambios" del formulario de modificación */
 #saveChangesButton { /* Asumiendo que este es el ID correcto */
-    background: linear-gradient(to right, #667eea, #764ba2);
+    background: linear-gradient(to right, rgb(40, 143, 35), rgb(15, 54, 13));
     color: white;
     width: 100%;
     padding: 12px;

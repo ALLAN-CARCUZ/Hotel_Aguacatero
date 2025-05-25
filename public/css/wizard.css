@@ -118,7 +118,7 @@ body {
 /* Estilo para los campos de entrada */
 .input-field:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: rgb(40, 143, 35);
     box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
 }
 
