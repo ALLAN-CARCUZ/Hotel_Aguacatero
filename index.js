@@ -1,4 +1,7 @@
-require('dotenv').config();
+if (!process.env.ORACLE_CONNECTION || !process.env.STRIPE_SECRET_KEY) {
+  console.error("❌ ERROR: Variables de entorno no cargadas correctamente.");
+}
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const oracledb = require('oracledb');
