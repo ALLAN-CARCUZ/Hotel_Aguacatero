@@ -8,7 +8,7 @@ router.get('/usuario', authenticateToken, getReservacionesByUsuario);
 router.post('/create', reservacionController.createReservacion);
 //router.put('/update/:id_reservacion', authenticateToken, updateReservacion);
 router.put('/update/:id', authenticateToken, updateReservacion);
-router.delete('/cancel/:id_reservacion', authenticateToken, deleteReservacion);
+router.delete('/cancel/:id_reservacion', authenticateToken, reservacionController.deleteReservacion);
 router.get('/:id', obtenerReservacionPorId);
 router.get('/', authenticateToken, reservacionController.getReservaciones);
 router.get('/fechas-reservadas/:id_habitacion', reservacionController.getFechasReservadas);
@@ -21,7 +21,4 @@ router.get('/promedio/promedio-dias', reservacionController.getPromedioDiasReser
 
 
 
-
-
 module.exports = router;
-

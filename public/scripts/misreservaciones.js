@@ -226,6 +226,19 @@ function mostrarReservaciones(reservaciones) {
         const reservacionElement = document.createElement('div');
         reservacionElement.classList.add('reservacion-card');
         
+        let botonesAccion = '';
+        console.log(`Reservación ID: ${reservacion.id_reservacion}, Estado: ${reservacion.estado_reservacion}`);
+        if (reservacion.estado_reservacion !== 'Cancelada' &&
+            reservacion.estado_reservacion !== 'CanceladaReembolsada' &&
+            reservacion.estado_reservacion !== 'CanceladaErrorReembolso') {
+            botonesAccion = `
+                <button class="btn modificar" onclick="modificarReservacion(${reservacion.id_reservacion})">Modificar</button>
+                <button class="btn cancelar" onclick="cancelarReservacion(${reservacion.id_reservacion})">Cancelar</button>
+            `;
+        } else {
+            botonesAccion = `<p><strong>Estado:</strong> ${reservacion.estado_reservacion || 'Procesada como cancelada'}</p>`; // Mensaje más claro si el estado es null/undefined
+        }
+
         let serviciosList = reservacion.servicios && reservacion.servicios.length > 0
             ? reservacion.servicios.map(servicio => `<li>${servicio}</li>`).join('')
             : '<li>No hay servicios adicionales</li>';
@@ -239,17 +252,16 @@ function mostrarReservaciones(reservaciones) {
                 <h3>Reservación ID: ${reservacion.id_reservacion}</h3>
             </div>
             <div class="reservacion-body">
-                <p><strong>Usuario:</strong> ${reservacion.nombre_usuario || 'No disponible'}</p> <!-- Aquí debe mostrar el nombre del usuario -->
-                ${detallesReservacion}
+                <p><strong>Usuario:</strong> ${reservacion.nombre_usuario || 'No disponible'}</p>
+                <p><strong>${reservacion.nombre_paquete ? 'Paquete: ' + reservacion.nombre_paquete : 'Habitación: ' + (reservacion.nombre_habitacion || 'N/A')}</strong></p>
                 <p><strong>Fecha de Ingreso:</strong> ${new Date(reservacion.fecha_ingreso).toLocaleDateString()}</p>
                 <p><strong>Fecha de Salida:</strong> ${new Date(reservacion.fecha_salida).toLocaleDateString()}</p>
-                <p><strong>Total:</strong> $${reservacion.costo_total.toFixed(2)}</p>
-                <h4>Servicios Incluidos:</h4>
-                <ul>${serviciosList}</ul>
+                <p><strong>Costo Total:</strong> $${reservacion.costo_total.toFixed(2)}</p>
+                <h4>Servicios:</h4>
+                <ul>${reservacion.servicios && reservacion.servicios.length > 0 ? reservacion.servicios.map(s => `<li>${s}</li>`).join('') : '<li>Ninguno</li>'}</ul>
             </div>
             <div class="reservacion-footer">
-                <button class="btn modificar" onclick="modificarReservacion(${reservacion.id_reservacion})">Modificar</button>
-                <button class="btn cancelar" onclick="cancelarReservacion(${reservacion.id_reservacion})">Cancelar</button>
+                ${botonesAccion}
             </div>
         `;
         container.appendChild(reservacionElement);

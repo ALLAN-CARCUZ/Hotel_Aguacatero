@@ -6,64 +6,50 @@ const dbConfig = {
 };
 
 // Modificación en la función para crear una nueva reservación
-async function createReservacion(id_usuario, id_habitacion, id_paquete, costo_total, metodo_pago, fecha_ingreso, fecha_salida, servicios) {
+async function createReservacion(id_usuario, id_habitacion, id_paquete, costo_total, metodo_pago, fecha_ingreso, fecha_salida, servicios, payment_intent_id = null) {
     let connection;
     try {
         connection = await oracledb.getConnection(dbConfig);
-        
         let query, binds;
 
         if (id_paquete) {
-            // Si se selecciona un paquete, no necesitamos id_habitacion ni servicios
             query = `
-                INSERT INTO RESERVACIONES (ID_RESERVACION, ID_USUARIO, ID_PAQUETE, COSTO_TOTAL, METODO_PAGO, FECHA_INGRESO, FECHA_SALIDA, FECHA_RESERVACION) 
-                VALUES (reservaciones_seq.NEXTVAL, :id_usuario, :id_paquete, :costo_total, :metodo_pago, TO_DATE(:fecha_ingreso, 'YYYY-MM-DD'), TO_DATE(:fecha_salida, 'YYYY-MM-DD'), SYSDATE)
+                INSERT INTO RESERVACIONES (ID_RESERVACION, ID_USUARIO, ID_PAQUETE, COSTO_TOTAL, METODO_PAGO, FECHA_INGRESO, FECHA_SALIDA, FECHA_RESERVACION, PAYMENT_INTENT_ID)
+                VALUES (reservaciones_seq.NEXTVAL, :id_usuario, :id_paquete, :costo_total, :metodo_pago, TO_DATE(:fecha_ingreso, 'YYYY-MM-DD'), TO_DATE(:fecha_salida, 'YYYY-MM-DD'), SYSDATE, :payment_intent_id)
                 RETURNING ID_RESERVACION INTO :id_reservacion
             `;
             binds = {
-                id_usuario,
-                id_paquete,
-                costo_total,
-                metodo_pago,
-                fecha_ingreso,
-                fecha_salida,
+                id_usuario, id_paquete, costo_total, metodo_pago,
+                fecha_ingreso, fecha_salida, payment_intent_id, // Añadido
                 id_reservacion: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }
             };
         } else {
-            // Si se elige habitación y servicios
             query = `
-                INSERT INTO RESERVACIONES (ID_RESERVACION, ID_USUARIO, ID_HABITACION, COSTO_TOTAL, METODO_PAGO, FECHA_INGRESO, FECHA_SALIDA, FECHA_RESERVACION) 
-                VALUES (reservaciones_seq.NEXTVAL, :id_usuario, :id_habitacion, :costo_total, :metodo_pago, TO_DATE(:fecha_ingreso, 'YYYY-MM-DD'), TO_DATE(:fecha_salida, 'YYYY-MM-DD'), SYSDATE)
+                INSERT INTO RESERVACIONES (ID_RESERVACION, ID_USUARIO, ID_HABITACION, COSTO_TOTAL, METODO_PAGO, FECHA_INGRESO, FECHA_SALIDA, FECHA_RESERVACION, PAYMENT_INTENT_ID)
+                VALUES (reservaciones_seq.NEXTVAL, :id_usuario, :id_habitacion, :costo_total, :metodo_pago, TO_DATE(:fecha_ingreso, 'YYYY-MM-DD'), TO_DATE(:fecha_salida, 'YYYY-MM-DD'), SYSDATE, :payment_intent_id)
                 RETURNING ID_RESERVACION INTO :id_reservacion
             `;
             binds = {
-                id_usuario,
-                id_habitacion,
-                costo_total,
-                metodo_pago,
-                fecha_ingreso,
-                fecha_salida,
+                id_usuario, id_habitacion, costo_total, metodo_pago,
+                fecha_ingreso, fecha_salida, payment_intent_id, // Añadido
                 id_reservacion: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }
             };
         }
 
         const result = await connection.execute(query, binds);
+        const new_id_reservacion = result.outBinds.id_reservacion[0];
 
-        const id_reservacion = result.outBinds.id_reservacion[0]; // Obtener el ID de la reservación generada
-
-        // Solo insertar servicios si no se seleccionó un paquete
         if (!id_paquete && servicios && servicios.length > 0) {
             for (const id_servicio of servicios) {
                 await connection.execute(
-                    `INSERT INTO RESERVACIONES_SERVICIOS (ID_RESERVACION, ID_SERVICIO) 
+                    `INSERT INTO RESERVACIONES_SERVICIOS (ID_RESERVACION, ID_SERVICIO)
                      VALUES (:id_reservacion, :id_servicio)`,
-                    { id_reservacion, id_servicio }
+                    { id_reservacion: new_id_reservacion, id_servicio }
                 );
             }
         }
-
         await connection.commit();
-        return { success: true, message: 'Reservación creada exitosamente', id_reservacion };
+        return { success: true, message: 'Reservación creada exitosamente', id_reservacion: new_id_reservacion };
     } catch (err) {
         console.error('Error al crear la reservación:', err);
         if (connection) {
@@ -83,12 +69,11 @@ async function getReservaciones() {
     let connection;
     try {
         connection = await oracledb.getConnection(dbConfig);
-        
         const result = await connection.execute(
-            `SELECT r.ID_RESERVACION, h.NOMBRE AS NOMBRE_HABITACION, h.IMAGEN AS IMAGEN_HABITACION, 
-                    p.NOMBRE AS NOMBRE_PAQUETE, p.IMAGEN AS IMAGEN_PAQUETE, 
-                    r.FECHA_INGRESO, r.FECHA_SALIDA, r.COSTO_TOTAL, 
-                    s.NOMBRE AS NOMBRE_SERVICIO, u.NOMBRE AS NOMBRE_USUARIO
+            `SELECT r.ID_RESERVACION, h.NOMBRE AS NOMBRE_HABITACION, h.IMAGEN AS IMAGEN_HABITACION,
+                    p.NOMBRE AS NOMBRE_PAQUETE, p.IMAGEN AS IMAGEN_PAQUETE,
+                    r.FECHA_INGRESO, r.FECHA_SALIDA, r.COSTO_TOTAL,
+                    s.NOMBRE AS NOMBRE_SERVICIO, u.NOMBRE AS NOMBRE_USUARIO, r.ESTADO_RESERVACION -- <<<< AÑADIDO AQUÍ
              FROM RESERVACIONES r
              LEFT JOIN HABITACIONES h ON r.ID_HABITACION = h.ID
              LEFT JOIN PAQUETES p ON r.ID_PAQUETE = p.ID
@@ -99,16 +84,18 @@ async function getReservaciones() {
         );
 
         const reservaciones = [];
-
-        for (const row of result.rows) {
-            const [id_reservacion, nombre_habitacion, imagen_habitacion, nombre_paquete, imagen_paquete, fecha_ingreso, fecha_salida, costo_total, nombre_servicio, nombre_usuario] = row;
+        for (const row of result.rows) { // Cambiado a for...of para claridad en desestructuración
+            const [
+                id_reservacion, nombre_habitacion, imagen_habitacion_blob,
+                nombre_paquete, imagen_paquete_blob,
+                fecha_ingreso, fecha_salida, costo_total,
+                nombre_servicio, nombre_usuario, estado_reservacion // <<<< AÑADIDO AQUÍ
+            ] = row;
 
             let reservacion = reservaciones.find(r => r.id_reservacion === id_reservacion);
-
             if (!reservacion) {
-                // Convierte la imagen a base64 solo si no es nula y es un BLOB
-                const imagenHabitacionBase64 = imagen_habitacion && imagen_habitacion instanceof Buffer ? imagen_habitacion.toString('base64') : null;
-                const imagenPaqueteBase64 = imagen_paquete && imagen_paquete instanceof Buffer ? imagen_paquete.toString('base64') : null;
+                const imagenHabitacionBase64 = imagen_habitacion_blob && imagen_habitacion_blob instanceof Buffer ? imagen_habitacion_blob.toString('base64') : null;
+                const imagenPaqueteBase64 = imagen_paquete_blob && imagen_paquete_blob instanceof Buffer ? imagen_paquete_blob.toString('base64') : null;
 
                 reservacion = {
                     id_reservacion,
@@ -120,18 +107,16 @@ async function getReservaciones() {
                     fecha_salida,
                     costo_total,
                     nombre_usuario,
+                    estado_reservacion, // <<<< AÑADIDO AQUÍ
                     servicios: []
                 };
                 reservaciones.push(reservacion);
             }
-
-            if (nombre_servicio) {
+            if (nombre_servicio && !reservacion.servicios.includes(nombre_servicio)) {
                 reservacion.servicios.push(nombre_servicio);
             }
         }
-
         return reservaciones;
-
     } finally {
         if (connection) {
             await connection.close();
@@ -235,52 +220,50 @@ async function deleteReservacion(id_reservacion) {
 // Función para obtener las reservaciones de un usuario
 async function getReservacionesByUsuario(id_usuario) {
     let connection;
-
     try {
         connection = await oracledb.getConnection(dbConfig);
-        
-        // Modificar la consulta para incluir el nombre del usuario
         const result = await connection.execute(
-            `SELECT r.ID_RESERVACION, h.NOMBRE AS NOMBRE_HABITACION, p.NOMBRE AS NOMBRE_PAQUETE, 
-                    r.FECHA_INGRESO, r.FECHA_SALIDA, r.COSTO_TOTAL, s.NOMBRE AS NOMBRE_SERVICIO, 
-                    u.NOMBRE AS NOMBRE_USUARIO  -- Aquí obtenemos el nombre del usuario
+            `SELECT r.ID_RESERVACION, h.NOMBRE AS NOMBRE_HABITACION, p.NOMBRE AS NOMBRE_PAQUETE,
+                    r.FECHA_INGRESO, r.FECHA_SALIDA, r.COSTO_TOTAL, s.NOMBRE AS NOMBRE_SERVICIO,
+                    u.NOMBRE AS NOMBRE_USUARIO, r.ESTADO_RESERVACION  -- <<<< AÑADIDO AQUÍ
              FROM RESERVACIONES r
              LEFT JOIN HABITACIONES h ON r.ID_HABITACION = h.ID
              LEFT JOIN PAQUETES p ON r.ID_PAQUETE = p.ID
              LEFT JOIN RESERVACIONES_SERVICIOS rs ON r.ID_RESERVACION = rs.ID_RESERVACION
              LEFT JOIN SERVICIOS s ON rs.ID_SERVICIO = s.ID
-             JOIN USUARIOS u ON r.ID_USUARIO = u.ID  -- Unir con la tabla de usuarios para obtener el nombre
+             JOIN USUARIOS u ON r.ID_USUARIO = u.ID
              WHERE r.ID_USUARIO = :id_usuario
              ORDER BY r.FECHA_INGRESO DESC`,
             [id_usuario]
         );
 
         const reservaciones = [];
-
         result.rows.forEach(row => {
-            const [id_reservacion, nombre_habitacion, nombre_paquete, fecha_ingreso, fecha_salida, costo_total, nombre_servicio, nombre_usuario] = row;
+            const [
+                id_reservacion, nombre_habitacion, nombre_paquete,
+                fecha_ingreso, fecha_salida, costo_total, nombre_servicio,
+                nombre_usuario, estado_reservacion // <<<< AÑADIDO AQUÍ
+            ] = row;
 
             let reservacion = reservaciones.find(r => r.id_reservacion === id_reservacion);
-
             if (!reservacion) {
                 reservacion = {
                     id_reservacion,
                     nombre_habitacion,
-                    nombre_paquete,  // Nombre del paquete
+                    nombre_paquete,
                     fecha_ingreso,
                     fecha_salida,
                     costo_total,
-                    nombre_usuario,  // Nombre del usuario
+                    nombre_usuario,
+                    estado_reservacion, // <<<< AÑADIDO AQUÍ
                     servicios: []
                 };
                 reservaciones.push(reservacion);
             }
-
-            if (nombre_servicio) {
+            if (nombre_servicio && !reservacion.servicios.includes(nombre_servicio)) {
                 reservacion.servicios.push(nombre_servicio);
             }
         });
-
         return reservaciones;
 
     } catch (error) {

@@ -1,7 +1,14 @@
 const reservacionModel = require('../models/reservacionModel');
 const { getUserById } = require('../models/usuarioModel');
-const { getServicioById } = require('../models/servicioModel'); // Importamos la función de búsqueda de servicio por ID
+const { getServicioById } = require('../models/servicioModel');
 const nodemailer = require('nodemailer');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const oracledb = require('oracledb');
+const dbConfig = { // O importa tu configuración de dbConfig
+    user: process.env.ORACLE_USER,
+    password: process.env.ORACLE_PASSWORD,
+    connectString: process.env.ORACLE_CONNECTION
+};
 
 // Configurar el transporte para enviar correos
 const transporter = nodemailer.createTransport({
@@ -13,11 +20,11 @@ const transporter = nodemailer.createTransport({
 });
 
 async function createReservacion(req, res) {
-    const { id_usuario, id_habitacion, id_paquete, costo_total, metodo_pago, fecha_ingreso, fecha_salida, servicios = [] } = req.body;
+    // Añadir payment_intent_id a la desestructuración
+    const { id_usuario, id_habitacion, id_paquete, costo_total, metodo_pago, fecha_ingreso, fecha_salida, servicios = [], payment_intent_id } = req.body;
 
-    console.log("Datos recibidos:", req.body);
+    console.log("Datos recibidos para crear reservación:", req.body);
 
-    // Validar los campos requeridos
     if (!id_usuario || (!id_paquete && !id_habitacion) || !costo_total || !metodo_pago || !fecha_ingreso || !fecha_salida) {
         return res.status(400).json({ error: 'Debes seleccionar una habitación o un paquete, y proporcionar todos los campos requeridos' });
     }
@@ -40,7 +47,10 @@ async function createReservacion(req, res) {
             }
         }
         // Intentar crear la reservación
-        const result = await reservacionModel.createReservacion(id_usuario, id_habitacion, id_paquete, costo_total, metodo_pago, fecha_ingreso, fecha_salida, servicios);
+        const result = await reservacionModel.createReservacion(id_usuario, id_habitacion, id_paquete, costo_total, metodo_pago, fecha_ingreso, fecha_salida, servicios, payment_intent_id);
+        if (!result.success) { // El modelo ahora devuelve un objeto con 'success'
+            return res.status(500).json({ error: result.message || 'Error al guardar la reservación en el modelo.' });
+        }
         const usuario = await getUserById(id_usuario);
         if (!usuario) {
             return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -52,7 +62,7 @@ async function createReservacion(req, res) {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: correoCliente,
-            subject: 'Confirmación de reservación - Hotel El Dodo',
+            subject: 'Confirmación de reservación - Hotel El Aguacatero',
             text: `Estimado/a ${usuario.nombre},\n\nSu reservación ha sido creada exitosamente. Aquí están los detalles:\n\n
             ${id_paquete ? `Paquete ID: ${id_paquete}` : `Habitación: ${id_habitacion}`}\n
             Fecha de entrada: ${fecha_ingreso}\n
@@ -149,29 +159,128 @@ async function updateReservacion(req, res) {
 
 async function deleteReservacion(req, res) {
     const { id_reservacion } = req.params;
-    console.log("ID de la reservación a eliminar:", id_reservacion);
+    console.log("Iniciando proceso de cancelación para reservación ID:", id_reservacion);
 
     if (!id_reservacion) {
         return res.status(400).json({ error: 'El ID de la reservación es requerido' });
     }
 
+    let connection;
     try {
-        // Eliminar las relaciones de la tabla intermedia (RESERVACIONES_SERVICIOS)
-        await reservacionModel.deleteReservacionServicios(id_reservacion);
-        console.log("Relaciones de servicios eliminadas para la reservación:", id_reservacion);
+        connection = await oracledb.getConnection(dbConfig);
+        // No hay connection.begin() en node-oracledb, la transacción se maneja con commit/rollback
 
-        // Ahora eliminar la reservación en la tabla principal (RESERVACIONES)
-        const result = await reservacionModel.deleteReservacion(id_reservacion);
-        console.log("Resultado de la eliminación de la reservación:", result);
+        const reservacionDataResult = await connection.execute(
+            `SELECT payment_intent_id, metodo_pago, costo_total, id_usuario, fecha_ingreso
+             FROM RESERVACIONES
+             WHERE ID_RESERVACION = :id`,
+            [id_reservacion],
+            { autoCommit: false } // Para que sea parte de la transacción general
+        );
 
-        if (!result || result.rowsAffected === 0) {
+        if (reservacionDataResult.rows.length === 0) {
             return res.status(404).json({ error: 'Reservación no encontrada' });
         }
 
-        res.status(200).json({ message: 'Reservación y relaciones eliminadas exitosamente' });
+        const reservacionOriginal = reservacionDataResult.rows[0];
+        const payment_intent_id = reservacionOriginal[0];
+        const metodo_pago = reservacionOriginal[1];
+        const costo_total_reservacion = reservacionOriginal[2];
+        const id_usuario_reservacion = reservacionOriginal[3];
+        // const fecha_ingreso_reservacion = reservacionOriginal[4]; // Puedes usarla para políticas de cancelación
+
+        let mensajeReembolso = "No se requirió reembolso por Stripe o la reservación no calificaba para ello.";
+        let refundIdStripe = null;
+        let estadoFinalReservacion = 'Cancelada'; // Estado por defecto para todas las cancelaciones
+
+        if (metodo_pago === 'tarjeta' && payment_intent_id) {
+            try {
+                console.log(`Intentando reembolso para Payment Intent: ${payment_intent_id}`);
+                const refund = await stripe.refunds.create({
+                    payment_intent: payment_intent_id,
+                    reason: 'requested_by_customer',
+                });
+                refundIdStripe = refund.id;
+                mensajeReembolso = `Reembolso procesado exitosamente (ID Stripe: ${refundIdStripe}).`;
+                estadoFinalReservacion = 'CanceladaReembolsada';
+                console.log(`Reembolso ${refundIdStripe} creado para PI: ${payment_intent_id}`);
+
+                // Actualizar con datos del reembolso
+                await connection.execute(
+                    `UPDATE RESERVACIONES
+                     SET stripe_refund_id = :stripe_refund_id, estado_reservacion = :estado
+                     WHERE ID_RESERVACION = :id_r`,
+                    { stripe_refund_id: refundIdStripe, estado: estadoFinalReservacion, id_r: id_reservacion },
+                    { autoCommit: false }
+                );
+
+            } catch (reembolsoError) {
+                console.error(`Error al procesar reembolso para PI ${payment_intent_id}:`, reembolsoError);
+                mensajeReembolso = `Error al procesar el reembolso: ${reembolsoError.message}. Contacte a soporte.`;
+                estadoFinalReservacion = 'CanceladaErrorReembolso';
+                await connection.execute(
+                    `UPDATE RESERVACIONES
+                     SET estado_reservacion = :estado, notas_admin = :notas
+                     WHERE ID_RESERVACION = :id_r`,
+                    { estado: estadoFinalReservacion, notas: `Error Stripe: ${reembolsoError.message}`, id_r: id_reservacion },
+                    { autoCommit: false }
+                );
+            }
+        } else {
+            console.log(`Reservación ID: ${id_reservacion}. Método de pago: ${metodo_pago || 'No especificado'}. Payment Intent ID: ${payment_intent_id || 'N/A'}. Marcando como Cancelada.`);
+            const updateResult = await connection.execute( // Guardar resultado
+                `UPDATE RESERVACIONES SET ESTADO_RESERVACION = :estado WHERE ID_RESERVACION = :id_r`,
+                { estado: estadoFinalReservacion, id_r: id_reservacion },
+                { autoCommit: false }
+            );
+            console.log(`Resultado del UPDATE de estado para reservación ${id_reservacion}:`, updateResult); // <--- LOG NUEVO
+        }
+
+        // Opcional: Eliminar servicios asociados si esa es tu política incluso para reservaciones solo marcadas como canceladas.
+        await reservacionModel.deleteReservacionServicios(id_reservacion, connection);
+        console.log("Relaciones de servicios (si las hubo) eliminadas para la reservación:", id_reservacion);
+
+        // NO ELIMINAMOS LA FILA DE LA TABLA RESERVACIONES, solo actualizamos su estado.
+
+        const usuario = await getUserById(id_usuario_reservacion);
+        if (usuario && usuario.correo) {
+            const mailOptionsCancelacion = {
+                from: process.env.EMAIL_USER,
+                to: usuario.correo,
+                subject: 'Confirmación de Cancelación de Reservación - Hotel El Aguacatero',
+                text: `Estimado/a ${usuario.nombre},\n\n` +
+                      `Su reservación con ID ${id_reservacion} ha sido cancelada.\n` +
+                      `${(metodo_pago === 'tarjeta' && payment_intent_id && refundIdStripe) ? `Se ha procesado un reembolso a su método de pago original. Este puede tardar varios días hábiles en reflejarse en su cuenta. ID del Reembolso Stripe: ${refundIdStripe}.\n` : ''}` +
+                      `Detalles adicionales: ${mensajeReembolso}\n\n` +
+                      `Lamentamos cualquier inconveniente.\n\n` +
+                      `Atentamente,\nEl Equipo del Hotel El Aguacatero`
+            };
+            transporter.sendMail(mailOptionsCancelacion, (mailError, info) => {
+                if(mailError) {
+                    console.error(`Error al enviar correo de cancelación a ${usuario.correo}:`, mailError);
+                } else {
+                    console.log(`Correo de cancelación enviado a ${usuario.correo}: ${info.response}`);
+                }
+            });
+        }
+
+        await connection.commit(); // Confirmar la transacción (que incluye el UPDATE del estado)
+
+        res.status(200).json({
+            message: `Proceso de cancelación para reservación ${id_reservacion} completado. ${mensajeReembolso}`,
+            refund_id: refundIdStripe
+        });
+
     } catch (error) {
-        console.error("Error durante la eliminación:", error);
-        res.status(500).json({ error: 'Error interno del servidor: ' + error.message });
+        console.error("Error durante la cancelación:", error);
+        if (connection) {
+            try { await connection.rollback(); } catch (rollbackError) { console.error("Error al hacer rollback:", rollbackError); }
+        }
+        res.status(500).json({ error: 'Error interno del servidor durante la cancelación: ' + error.message });
+    } finally {
+        if (connection) {
+            try { await connection.close(); } catch (closeError) { console.error("Error al cerrar la conexión:", closeError); }
+        }
     }
 }
 
