@@ -1,5 +1,5 @@
 const oracledb = require('oracledb'); // Agrega esta línea si no estaba
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe');
 
 const dbConfig = {
     user: process.env.ORACLE_USER,
@@ -11,6 +11,7 @@ exports.crearIntentoDePago = async (req, res) => {
     const { amount } = req.body;
 
     try {
+        const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
         const intent = await stripe.paymentIntents.create({
             amount,
             currency: 'usd',
@@ -35,6 +36,7 @@ exports.createPayment = async (req, res) => {
 
     let connection;
     try {
+        const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
         if (!payment_method_id || !costo_total || !id_usuario || !id_reservacion) {
             throw new Error("Faltan datos necesarios para el pago.");
         }
@@ -90,6 +92,7 @@ exports.reembolsarPago = async (req, res) => {
 
     let connection;
     try {
+        const stripe = stripeLib(process.env.STRIPE_SECRET_KEY || '');
         connection = await oracledb.getConnection(dbConfig);
 
         const result = await connection.execute(
